@@ -2,13 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "port/port_handler.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -20,5 +20,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    port_control::PortHandler *port_handler_;
 };
 #endif // MAINWINDOW_H

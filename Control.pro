@@ -15,15 +15,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+INCLUDEPATH += ./include
+
 SOURCES += \
-    main.cpp \
-    mainwindow.cpp
+    src/main.cpp \
+    src/port/port_handler.cpp \
+    src/port/port_handler_windows.cpp \
+    src/ui/mainwindow.cpp
 
 HEADERS += \
-    mainwindow.h
+    include/port/port_define.h \
+    include/port/port_handler_windows.h \
+    include/ui/mainwindow.h \
+    include/port/port_handler.h
 
 FORMS += \
-    mainwindow.ui
+    ui/mainwindow.ui
 
 TRANSLATIONS += \
     Control_zh_CN.ts
