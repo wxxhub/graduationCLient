@@ -10,6 +10,7 @@ namespace port_control {
 class PortHandler {
 public:
     static PortHandler *getPortHandler();
+    bool isOpen(){return is_open_;}
 
     virtual ~PortHandler(){};
 
@@ -34,6 +35,9 @@ public:
     virtual double getTimeSinceStart() = 0;
 
     virtual std::vector<std::string> scanPort() = 0;
+
+protected:
+    bool is_open_;
 };
 }
 

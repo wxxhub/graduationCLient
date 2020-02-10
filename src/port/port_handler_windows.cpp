@@ -6,8 +6,7 @@ using namespace port_control;
 PortHandlerWindows::PortHandlerWindows()
     : baud_rate_(DEFAULT_BAUDREATE),
       packet_timeout_(0.0),
-      packet_start_time_(0.0),
-      is_using_(false) {
+      packet_start_time_(0.0) {
 
     for (int i = 0; i < 10; i++) {
         char port_name[32];
@@ -59,6 +58,7 @@ bool PortHandlerWindows::setupPort(const int baud_rate) {
 
     tx_time_per_byte_ = (1000.0 / double(baud_rate));
 
+    is_open_ = true;
     return true;
 }
 
@@ -67,6 +67,7 @@ void PortHandlerWindows::closePort() {
         CloseHandle(com_);
         com_ = INVALID_HANDLE_VALUE;
     }
+    is_open_ = false;
 }
 
 void PortHandlerWindows::clearPort() {
@@ -141,6 +142,7 @@ std::vector<std::string> PortHandlerWindows::scanPort() {
             std::string port_name = *iter;
             openning_ports.push_back(port_name);
         }
+        closePort();
     }
 
     return openning_ports;

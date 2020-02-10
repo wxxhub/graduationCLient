@@ -12,8 +12,6 @@ private:
     HANDLE com_;
     LARGE_INTEGER freq_, counter_;
 
-    bool is_using_;
-
     int baud_rate_;
     char port_name_[32];
 

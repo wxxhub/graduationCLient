@@ -139,41 +139,8 @@
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QLabel" name="label">
-             <property name="minimumSize">
-              <size>
-               <width>40</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>40</width>
-               <height>30</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>端口：</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="portChangeBox">
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>30</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
+           <item row="1" column="0">
             <widget class="QLabel" name="label_2">
              <property name="minimumSize">
               <size>
@@ -192,26 +159,7 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QSpinBox" name="FarAddr"/>
-           </item>
-           <item row="0" column="2">
-            <widget class="QSpinBox" name="FarPort">
-             <property name="minimumSize">
-              <size>
-               <width>60</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>60</width>
-               <height>30</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
+           <item row="2" column="0">
             <widget class="QLabel" name="label_3">
              <property name="minimumSize">
               <size>
@@ -231,21 +179,85 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QSpinBox" name="LocalAddr"/>
+            <widget class="QSpinBox" name="FarAddr"/>
            </item>
-           <item row="1" column="2">
+           <item row="2" column="2">
             <widget class="QSpinBox" name="LocalPort">
              <property name="minimumSize">
               <size>
-               <width>60</width>
+               <width>90</width>
                <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>60</width>
+               <width>90</width>
                <height>30</height>
               </size>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QSpinBox" name="FarPort">
+             <property name="minimumSize">
+              <size>
+               <width>90</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>90</width>
+               <height>30</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QSpinBox" name="LocalAddr"/>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label">
+             <property name="minimumSize">
+              <size>
+               <width>40</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>40</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>端口：</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="changePortComboBox">
+             <property name="styleSheet">
+              <string notr="true">background-color:rgb(255, 255, 255)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QComboBox" name="baudrateComboBox">
+             <property name="minimumSize">
+              <size>
+               <width>90</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>90</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color:rgb(255, 255, 255)</string>
              </property>
             </widget>
            </item>
@@ -259,6 +271,25 @@
            <property name="sizeConstraint">
             <enum>QLayout::SetDefaultConstraint</enum>
            </property>
+           <item>
+            <widget class="QPushButton" name="SwitchButton">
+             <property name="minimumSize">
+              <size>
+               <width>40</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>40</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>打开</string>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QPushButton" name="SendDataButton">
              <property name="minimumSize">
