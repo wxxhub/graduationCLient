@@ -23,6 +23,10 @@ public:
 private slots:
     void on_SwitchButton_clicked();
 
+    void on_CleanWindowButton_clicked();
+
+    void on_UpdateButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     port_control::PortHandler *port_handler_;
@@ -33,5 +37,7 @@ private:
     void portReadThread();
     void updateSwitchButton();
     bool ui_running_;
+
+    uchar image_data[320 * 240] = {0};
 };
 #endif // MAINWINDOW_H

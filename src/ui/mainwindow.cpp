@@ -79,25 +79,42 @@ void MainWindow::init() {
    for (; iter != baudrate_list.end(); iter++) {
         ui->baudrateComboBox->addItem(QString::number(*iter));
    }
+
+   // init image
+   QImage image("C:\\Users\\wxx\\Pictures\\Screenshots\\屏幕截图(1).png");
+   QPixmap pix_map = QPixmap::fromImage(image);
+   ui->ImageView->setPixmap(pix_map);
 }
 
 void MainWindow::portReadThread() {
+    int n = 0;
     while (ui_running_) {
 //        cout << "portReadThread" << endl;
-        if (port_handler_->isOpen()) {
+        if (port_handler_->isOpen() && switch_button_state_) {
             uint8_t data;
             if(port_handler_->readPort(&data, 1)) {
-                char code[8];
-                sprintf(code, "%x", int(data));
+                  if (data == 0XFF) {
+                      n = 0;
+                      QImage image(image_data, 320, 240, QImage::Format_Grayscale8);
+                      QPixmap pix_map = QPixmap::fromImage(image);
+//                      pix_map.fromImage(image);
+                      ui->ImageView->setPixmap(pix_map);
+                  }
+                  image_data[n] = data;
+                  cout << n++ << ":" << int(data) << endl;
+//                char code[2];
+//                sprintf(code, "%2x", int(data));
 //                ui->readDataText->append(QString(code));
-                ui->readDataText->setText("test");
+//                ui->readDataText->moveCursor(QTextCursor::End);
+//                ui->readDataText->insertPlainText(QString("test"));
+//                ui->readDataText->insertPlainText(QString("test\n"));
             }
 
         } else {
 //            cout << "port not open" << endl;
         }
 
-        sleep_ms(1);
+//        sleep_ms(1);
     }
 }
 
@@ -129,4 +146,14 @@ void MainWindow::on_SwitchButton_clicked()
         updateSwitchButton();
         cout << "close port" << endl;
     }
+}
+
+void MainWindow::on_CleanWindowButton_clicked()
+{
+    ui->readDataText->clear();
+}
+
+void MainWindow::on_UpdateButton_clicked()
+{
+    update();
 }
