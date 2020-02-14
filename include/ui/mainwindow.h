@@ -5,10 +5,17 @@
 #include <QMainWindow>
 
 #include "port/port_handler.h"
+#include "image_socket/image_socket.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+enum DataState {
+    CLOSE = -1,
+    PORT = 0,
+    SERVER = 1,
+};
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -27,17 +34,29 @@ private slots:
 
     void on_UpdateButton_clicked();
 
+    void on_ServerButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     port_control::PortHandler *port_handler_;
+    image_socket::ImageSocket *image_socket_;
 
     std::thread port_read_thread_;
+    std::thread socket_read_thread_;
     bool switch_button_state_;
 
     void portReadThread();
-    void updateSwitchButton();
+    void socketReadThread();
+    void addIP(const char* ip);
+    void changeState(DataState state);
     bool ui_running_;
 
-    uchar image_data[320 * 240] = {0};
+    int image_data_i_;  //记录图像数据位
+
+    const int image_width_;
+    const int image_height_;
+
+    DataState current_state_;
+    std::string current_ip_;
 };
 #endif // MAINWINDOW_H

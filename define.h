@@ -1,4 +1,8 @@
-#ifndef DEFINE_H
-#define DEFINE_H
+#ifndef _DEFINE_H_
+#define _DEFINE_H_
 
-#endif // DEFINE_H
+#include <functional>
+
+typedef std::function<void(const char*)> CallbackFun;
+
+#endif // _DEFINE_H_

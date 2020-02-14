@@ -18,16 +18,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 INCLUDEPATH += ./include
 
 SOURCES += \
+    src/image_socket/image_socket.cpp \
+    src/image_socket/socket_windows.cpp \
     src/main.cpp \
     src/port/port_handler.cpp \
     src/port/port_handler_windows.cpp \
     src/ui/mainwindow.cpp
 
 HEADERS += \
+    define.h \
+    include/image_socket/image_socket.h \
+    include/image_socket/image_socket_define.h \
+    include/image_socket/socket_windows.h \
     include/port/port_define.h \
     include/port/port_handler_windows.h \
     include/ui/mainwindow.h \
-    include/port/port_handler.h
+    include/port/port_handler.h \
+    timer.h
 
 FORMS += \
     ui/mainwindow.ui
@@ -35,7 +42,12 @@ FORMS += \
 TRANSLATIONS += \
     Control_zh_CN.ts
 
+LIBS += -lpthread libwsock32 libws2_32
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    README.md

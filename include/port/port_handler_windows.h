@@ -1,7 +1,7 @@
 #ifndef _PORT_HANDLER_WINDOWS_H_
 #define _PORT_HANDLER_WINDOWS_H_
 
-#include <Windows.h>
+#include <windows.h>
 
 #include "port/port_handler.h"
 
