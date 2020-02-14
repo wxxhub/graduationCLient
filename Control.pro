@@ -42,7 +42,13 @@ FORMS += \
 TRANSLATIONS += \
     Control_zh_CN.ts
 
-LIBS += -lpthread libwsock32 libws2_32
+win32:{
+    LIBS += -lpthread libwsock32 libws2_32
+}
+win64:{
+    LIBS += -lpthread libwsock32 libws2_32
+}
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
