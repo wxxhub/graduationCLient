@@ -15,7 +15,7 @@ public:
 
     bool openPort(const char* port_name);
     bool setBaudRate(const int baudrate);
-    bool setupPort(const int baud_rate);
+    bool setupPort();
 
     void closePort();
     void clearPort();
@@ -32,10 +32,7 @@ public:
 private:
     int baud_rate_;
     char port_name_[32];
-
-    double packet_start_time_;
-    double packet_timeout_;
-    double tx_time_per_byte_;
+    HANDLE com_;
 
     std::vector<std::string> ports_;
 };

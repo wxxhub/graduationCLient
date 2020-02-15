@@ -56,8 +56,6 @@ bool PortHandlerWindows::setupPort() {
     timeouts.WriteTotalTimeoutConstant = 0; //写时间常量
     SetCommTimeouts(com_, &time_out);  //设置超时
 
-    tx_time_per_byte_ = (1000.0 / double(baud_rate));
-
     is_open_ = true;
     return true;
 }
@@ -101,35 +99,6 @@ int PortHandlerWindows::writePort(uint8_t *packet, int length) {
     return -1;
 
   return (int)dwWrite;
-}
-
-void PortHandlerWindows::setPacketTimeout(double msec) {
-    packet_start_time_ = getCurrentTime();
-    packet_timeout_ = msec;
-}
-
-bool PortHandlerWindows::isPacketTimeout() {
-    if (getTimeSinceStart() > packet_timeout_)
-    {
-        packet_timeout_ = 0;
-        return true;
-    }
-    return false;
-}
-
-double PortHandlerWindows::getCurrentTime() {
-    QueryPerformanceCounter(&counter_);
-    QueryPerformanceFrequency(&freq_);
-    return (double)counter_.QuadPart / (double)freq_.QuadPart * 1000.0;
-}
-
-double PortHandlerWindows::getTimeSinceStart() {
-    double time;
-
-    time = getCurrentTime() - packet_start_time_;
-    if (time < 0.0) packet_start_time_ = getCurrentTime();
-
-    return time;
 }
 
 std::vector<std::string> PortHandlerWindows::scanPort() {
