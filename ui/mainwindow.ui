@@ -160,7 +160,7 @@
             <widget class="QPushButton" name="UpdateButton">
              <property name="minimumSize">
               <size>
-               <width>40</width>
+               <width>0</width>
                <height>0</height>
               </size>
              </property>
@@ -226,14 +226,14 @@
               <widget class="QPushButton" name="SwitchButton">
                <property name="minimumSize">
                 <size>
-                 <width>40</width>
+                 <width>0</width>
                  <height>0</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>10000</width>
-                 <height>10000</height>
+                 <height>16777215</height>
                 </size>
                </property>
                <property name="text">
@@ -465,7 +465,7 @@
      <x>0</x>
      <y>0</y>
      <width>970</width>
-     <height>25</height>
+     <height>28</height>
     </rect>
    </property>
   </widget>

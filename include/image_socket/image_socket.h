@@ -2,7 +2,7 @@
 #define IMAGESOCKET_H
 
 #include "define.h"
-#include "image_socket\image_socket_define.h"
+#include "image_socket/image_socket_define.h"
 
 namespace image_socket {
 
@@ -18,7 +18,7 @@ public:
     virtual bool updateSocket() = 0;
 
     virtual void setPort(int port) = 0;
-    virtual void close() = 0;
+    virtual void closeServer() = 0;
 
     virtual int readOneData(const std::string ip, char *data) = 0;
 protected:

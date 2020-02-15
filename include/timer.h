@@ -3,13 +3,11 @@
 
 #if defined (_WIN32) || defined (_WIN64)
 #include <Windows.h>
-#else
-    #pragma message("Have't adpter yout system...")
-#endif
 
 class ClockTime {
 public:
     void reset() {
+
         start_ = ::GetTickCount();
         end_ = ::GetTickCount();
     }
@@ -26,6 +24,30 @@ private:
     DWORD start_;
     DWORD end_;
 };
+#elif defined (linux)
+#include <time.h>
+class ClockTime {
+public:
+    void reset() {
+        clock_gettime(CLOCK_MONOTONIC, &start_);
+        clock_gettime(CLOCK_MONOTONIC, &end_);
+    }
+
+    int clockMs() {
+        clock_gettime(CLOCK_MONOTONIC, &end_);
+        int m = (end_.tv_sec - start_.tv_sec) * 1000 + (end_.tv_nsec - start_.tv_nsec) * 0.000001 ;
+
+        clock_gettime(CLOCK_MONOTONIC, &start_);
+        return m;
+    }
+
+private:
+    timespec start_;
+    timespec end_;
+};
+#else
+    #pragma message("Have't adpter yout system...")
+#endif // defined (_WIN32) || defined (_WIN64)
 
 void sleep_ms(int time) {
 #if defined (_WIN32) || defined (_WIN64)

@@ -1,6 +1,7 @@
 #ifndef _SOCKET_WINDOWS_H_
 #define _SOCKET_WINDOWS_H_
 
+#if defined (_WIN320) || defined (_WIN64)
 #include <windows.h>
 #include <thread>
 #include <map>
@@ -12,19 +13,20 @@ namespace image_socket {
 class SocketWindows : public ImageSocket{
 public:
     SocketWindows();
+    ~SocketWindows(){closeServer();}
 
     bool initSocket();
     bool updateSocket();
 
     void setPort(int port);
-    void close();
+    void closeServer();
 
     int readOneData(const std::string ip, char *data);
 
 private:
     void acceptThread();
 
-    SOCKET server_socket_;
+    int server_socket_;
     int port_;
 
     std::thread accept_thread_;
@@ -32,5 +34,5 @@ private:
 };
 
 }
-
+#endif // defined (_WIN320) || defined (_WIN64)
 #endif // _SOCKET_WINDOWS_H_

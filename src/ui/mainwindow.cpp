@@ -42,6 +42,7 @@ void MainWindow::update() {
     ui->changePortComboBox->clear();
     vector<string>::iterator iter = ports.begin();
     for (; iter != ports.end(); iter++) {
+        cout << *iter << endl;
         ui->changePortComboBox->addItem(QString(iter->c_str()));
     }
 }

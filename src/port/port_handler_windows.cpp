@@ -1,12 +1,12 @@
 #include <stdio.h>
+
+#if defined (_WIN320) || defined (_WIN64)
 #include "port/port_handler_windows.h"
 
 using namespace port_control;
 
 PortHandlerWindows::PortHandlerWindows()
-    : baud_rate_(DEFAULT_BAUDREATE),
-      packet_timeout_(0.0),
-      packet_start_time_(0.0) {
+    : baud_rate_(DEFAULT_BAUDREATE) {
 
     for (int i = 0; i < 10; i++) {
         char port_name[32];
@@ -21,13 +21,13 @@ bool PortHandlerWindows::openPort(const char* port_name) {
 }
 
 bool PortHandlerWindows::setBaudRate(const int baudrate) {
-    closePort();
+    if (baudrate == baud_rate_)
+        return true;
 
     baud_rate_ = baudrate;
-    return setupPort(baud_rate_);
 }
 
-bool PortHandlerWindows::setupPort(const int baud_rate) {
+bool PortHandlerWindows::setupPort() {
     DCB dcb;
     COMMTIMEOUTS timeouts;
 
@@ -42,7 +42,7 @@ bool PortHandlerWindows::setupPort(const int baud_rate) {
     SetupComm(com_, INPUT_CACHE, OUTPUT_CACHE);
 
     GetCommState(com_, &dcb);
-    dcb.BaudRate - baud_rate; //波特率
+    dcb.BaudRate - baud_rate_; //波特率
     dcb.ByteSize = 8;  //每个字节有8位
     dcb.Parity = NOPARITY;  //无奇偶校验位
     dcb.StopBits = ONESTOPBIT;  //一个停止位
@@ -147,3 +147,5 @@ std::vector<std::string> PortHandlerWindows::scanPort() {
 
     return openning_ports;
 }
+
+#endif // defined (_WIN320) || defined (_WIN64)

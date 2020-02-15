@@ -1,6 +1,6 @@
+#if defined (_WIN320) || defined (_WIN64)
 #include <iostream>
-
-#include "include\image_socket\socket_windows.h"
+#include "image_socket/socket_windows.h"
 
 using namespace std;
 using namespace image_socket;
@@ -20,6 +20,10 @@ bool SocketWindows::initSocket() {
         return false;
     }
 
+     return updateSocket();
+}
+
+bool SocketWindows::updateSocket() {
     //创建套接字
     server_socket_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -28,10 +32,6 @@ bool SocketWindows::initSocket() {
          return false;
      }
 
-     return updateSocket();
-}
-
-bool SocketWindows::updateSocket() {
     sockaddr_in sin;
 
     sin.sin_family = AF_INET;
@@ -59,7 +59,7 @@ void SocketWindows::setPort(int port) {
     port_ = port;
 }
 
-void SocketWindows::close() {
+void SocketWindows::closeServer() {
     is_open_ = false;
     closesocket(server_socket_);
     accept_thread_.join();
@@ -86,3 +86,5 @@ void SocketWindows::acceptThread() {
 int SocketWindows::readOneData(const std::string ip, char *data) {
     return recv(clients_[ip], data, 1, 0);
 }
+
+#endif // defined (_WIN320) || defined (_WIN64)
