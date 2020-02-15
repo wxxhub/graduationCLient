@@ -26,7 +26,7 @@ SOURCES += \
     src/ui/mainwindow.cpp
 
 HEADERS += \
-    define.h \
+    include/define.h \
     include/image_socket/image_socket.h \
     include/image_socket/image_socket_define.h \
     include/image_socket/socket_windows.h \
@@ -34,7 +34,7 @@ HEADERS += \
     include/port/port_handler_windows.h \
     include/ui/mainwindow.h \
     include/port/port_handler.h \
-    timer.h
+    include/timer.h
 
 FORMS += \
     ui/mainwindow.ui
