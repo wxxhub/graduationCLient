@@ -9,7 +9,6 @@
 
 using namespace std;
 
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -141,9 +140,10 @@ void MainWindow::socketReadThread() {
     cout << "socketReadThread" << endl;
     while (ui_running_ && current_state_ == SERVER) {
         if (image_socket_->isOpen()) {
+//           cout << "[" << current_ip_ << "]" << endl;
             char data;
 //            cout << "image_socket_->isOpen()" << endl;
-            if(image_socket_->readOneData("192.168.31.204", &data) > 0) {
+            if(image_socket_->readOneData(current_ip_, &data) > 0) {
                 uint8_t u_data = 0XFF & data;
 //                cout << int(u_data) << endl;
                 if (u_data == 0XFF) { // update image
@@ -178,7 +178,10 @@ void MainWindow::socketReadThread() {
 
 void MainWindow::addIP(const char* ip) {
     ui->ConectComboBox->addItem(QString(ip));
-    current_ip_ = ui->ConectComboBox->currentText().toStdString();
+    ui->ConectComboBox->update();
+//    ui->ConectComboBox->setCurrentText();
+//    current_ip_ = ui->ConectComboBox->currentData().toString().toStdString();
+//    current_ip_ = ui->ConectComboBox->currentText().toStdString();
 }
 
 void changeState(DataState state) {
@@ -239,4 +242,32 @@ void MainWindow::on_ServerButton_clicked()
             QMessageBox::warning(this, "open socket failed", "open socket failed!");
         }
     }
+}
+
+void MainWindow::on_SendDataButton_clicked()
+{
+    string data = ui->SendDataLine->text().toStdString();
+    switch (current_state_) {
+    case PORT: {
+        if (port_handler_->isOpen()) {
+            port_handler_->writePort(const_cast<char *>(data.c_str()), data.length());
+        }
+        break;
+    }
+    case SERVER: {
+        if (image_socket_->isOpen()) {
+            image_socket_->writeData(current_ip_, const_cast<char *>(data.c_str()), data.length());
+        }
+        break;
+    }
+    case CLOSE:{
+        QMessageBox::warning(this, "提示", "没有打开通讯接口!");
+        break;
+    }
+    }
+}
+
+void MainWindow::on_ConectComboBox_currentTextChanged(const QString &arg1)
+{
+    current_ip_ = arg1.toStdString();
 }

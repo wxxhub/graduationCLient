@@ -92,6 +92,10 @@ int PortHandlerLinux::writePort(uint8_t *packet, int length) {
     return write(handler_fd_, packet, length);
 }
 
+int PortHandlerLinux::writePort(char *packet, int length) {
+    return write(handler_fd_, packet, length);
+}
+
 
 vector<string> PortHandlerLinux::scanPort() {
     cout << "try open /dev/" << endl;

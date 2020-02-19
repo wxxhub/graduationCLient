@@ -20,7 +20,8 @@ public:
     virtual void setPort(int port) = 0;
     virtual void closeServer() = 0;
 
-    virtual int readOneData(const std::string ip, char *data) = 0;
+    virtual int readOneData(const std::string &ip, char *data) = 0;
+    virtual int writeData(const std::string &ip, char *data, int len) = 0;
 protected:
     bool is_open_;
     CallbackFun accept_callback_fun_;

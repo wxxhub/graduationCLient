@@ -60,8 +60,12 @@ void SocketLinux::closeServer() {
     }
 }
 
-int SocketLinux::readOneData(const std::string ip, char *data) {
+int SocketLinux::readOneData(const std::string &ip, char *data) {
     return recv(clients_[ip], data, 1, 0);
+}
+
+int SocketLinux::writeData(const std::string &ip, char *data, int len) {
+    return send(clients_[ip], data, len, 0);
 }
 
 void SocketLinux::acceptThread() {

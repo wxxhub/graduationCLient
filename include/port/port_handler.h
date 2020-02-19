@@ -27,6 +27,7 @@ public:
     virtual int getBaudRate() = 0;
     virtual int readPort(uint8_t *packet, int length) = 0;
     virtual int writePort(uint8_t *packet, int length) = 0;
+    virtual int writePort(char *packet, int length) = 0;
 
     virtual std::vector<std::string> scanPort() = 0;
 

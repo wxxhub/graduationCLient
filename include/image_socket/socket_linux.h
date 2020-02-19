@@ -24,7 +24,8 @@ public:
     void setPort(int port);
     void closeServer();
 
-    int readOneData(const std::string ip, char *data);
+    int readOneData(const std::string &ip, char *data);
+    int writeData(const std::string &ip, char *data, int len);
 
 private:
     int server_socket_;

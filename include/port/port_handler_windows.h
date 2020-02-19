@@ -26,6 +26,7 @@ public:
     int getBaudRate();
     int readPort(uint8_t *packet, int length);
     int writePort(uint8_t *packet, int length);
+    int writePort(char *packet, int length);
 
     std::vector<std::string> scanPort();
 

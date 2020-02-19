@@ -83,8 +83,12 @@ void SocketWindows::acceptThread() {
     }
 }
 
-int SocketWindows::readOneData(const std::string ip, char *data) {
+int SocketWindows::readOneData(const std::string &ip, char *data) {
     return recv(clients_[ip], data, 1, 0);
+}
+
+int SocketWindows::writeData(const std::string &ip, char *data, int len) {
+
 }
 
 #endif // defined (_WIN320) || defined (_WIN64)

@@ -36,6 +36,10 @@ private slots:
 
     void on_ServerButton_clicked();
 
+    void on_SendDataButton_clicked();
+
+    void on_ConectComboBox_currentTextChanged(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
     port_control::PortHandler *port_handler_;
