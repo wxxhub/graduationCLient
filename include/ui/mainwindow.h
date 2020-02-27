@@ -1,11 +1,17 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#define LOCAL_IMAGE_PROCESS
+
 #include <thread>
 #include <QMainWindow>
 
 #include "port/port_handler.h"
 #include "image_socket/image_socket.h"
+
+#ifdef LOCAL_IMAGE_PROCESS
+#include "image_process/image_process.h"
+#endif // LOCAL_IMAGE_PROCESS
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -40,6 +46,10 @@ private slots:
 
     void on_ConectComboBox_currentTextChanged(const QString &arg1);
 
+    void on_turnLeftButton_clicked();
+
+    void on_turnRightButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     port_control::PortHandler *port_handler_;
@@ -62,5 +72,8 @@ private:
 
     DataState current_state_;
     std::string current_ip_;
+#ifdef LOCAL_IMAGE_PROCESS
+    tf_image_process::ImageProcess *image_process_;
+#endif // LOCAL_IMAGE_PROCESS
 };
 #endif // MAINWINDOW_H

@@ -21,6 +21,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 INCLUDEPATH = "./include/"
 
 SOURCES += \
+    src/image_process/image_process.cpp \
     src/image_socket/image_socket.cpp \
     src/image_socket/socket_linux.cpp \
     src/image_socket/socket_windows.cpp \
@@ -32,6 +33,7 @@ SOURCES += \
 
 HEADERS += \
     include/define.h \
+    include/image_process/image_process.h \
     include/image_socket/image_socket.h \
     include/image_socket/image_socket_define.h \
     include/image_socket/socket_linux.h \
@@ -55,7 +57,19 @@ win32:{
 win64:{
     LIBS += -lpthread libwsock32 libws2_32
 }
+linux:{
+INCLUDEPATH += /home/wxx/lib/OpenCV4.2.0-gpu/include/opencv4 \
+               /home/wxx/lib/OpenCV4.2.0-gpu/include/opencv4/opencv2 \
 
+LIBS += /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_highgui.so \
+        /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_core.so \
+        /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_imgcodecs.so \
+        /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_objdetect.so \
+        /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_imgproc.so \
+        /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_video.so \
+        /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_videoio.so \
+        /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_dnn.so \
+}
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

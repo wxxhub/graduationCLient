@@ -9,6 +9,11 @@
 
 using namespace std;
 
+const int MAX_TURN_DISTANCE = 50;
+
+char turn_left_data[MAX_TURN_DISTANCE];
+char turn_right_data[MAX_TURN_DISTANCE];
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -32,6 +37,9 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() {
     ui_running_ = false;
     port_read_thread_.join();
+#ifdef LOCAL_IMAGE_PROCESS
+    delete image_process_;
+#endif // LOCAL_IMAGE_PROCESS
     delete ui;    
 }
 
@@ -47,6 +55,10 @@ void MainWindow::update() {
 }
 
 void MainWindow::init() {
+#ifdef LOCAL_IMAGE_PROCESS
+    image_process_ = new tf_image_process::ImageProcess("/home/wxx/Project/TensorflowTest/c_test/ssd_inception_v2_coco_2017_11_17/frozen_inference_graph.pb",
+                                                        "/home/wxx/Project/TensorflowTest/c_test/ssd_inception_v2_coco_2017_11_17/test.pbtxt");
+#endif // LOCAL_IMAGE_PROCESS
     // init button
    // updateSwitchButton();
     current_ip_ = "192.168.31.129";
@@ -79,9 +91,14 @@ void MainWindow::init() {
    QPixmap pix_map = QPixmap::fromImage(image);
    ui->ImageView->setPixmap(pix_map);
 
-   // image init
-   ui->ImageProgressBar->setRange(0, 100);
-   ui->ImageProgressBar->setValue(0);
+   // distance spinBox init
+   ui->distanceSpinBox->setPrefix("旋转步长");
+   ui->distanceSpinBox->setMinimum(1);
+   ui->distanceSpinBox->setMaximum(MAX_TURN_DISTANCE);
+   for (int i = 0; i < MAX_TURN_DISTANCE; i++) {
+       turn_left_data[i] = 'l';
+       turn_right_data[i] = 'r';
+   }
 }
 
 void MainWindow::portReadThread() {
@@ -100,7 +117,6 @@ void MainWindow::portReadThread() {
                     QImage image(image_data, image_width_, image_height_, QImage::Format_Grayscale8);
                     QPixmap pix_map = QPixmap::fromImage(image);
                     ui->ImageView->setPixmap(pix_map);
-                    ui->ImageProgressBar->setValue(0);
                 }
                 image_data[image_data_i_] = data;
 
@@ -108,7 +124,7 @@ void MainWindow::portReadThread() {
                     int value = image_data_i_ * 100 / size;
                     if (value < 100) {
 //                        ui->ImageProgressBar->setValue(value);
-                    }
+                }
 
                     ui->readDataText->insertPlainText(QString(cache.c_str()));
                     ui->readDataText->moveCursor(QTextCursor::End);
@@ -148,10 +164,26 @@ void MainWindow::socketReadThread() {
 //                cout << int(u_data) << endl;
                 if (u_data == 0XFF) { // update image
                     image_data_i_ = 0;
-                    QImage image(image_data, image_width_, image_height_, QImage::Format_Grayscale8);
+                    cout << clock_time.clockMs() << "ms" << endl;
+#ifdef LOCAL_IMAGE_PROCESS
+                    cv::Mat cv_image = cv::Mat(image_height_,image_width_, CV_8UC1, image_data);
+                    cv::Mat rgb_image;
+                    cvtColor(cv_image,rgb_image,CV_GRAY2BGR);
+
+#if 0
+                    cv::Mat result_image = image_process_->process(rgb_image);
+                    QImage image(result_image.data, image_width_, image_height_, QImage::Format_BGR888);
+#else
+                    QImage image(rgb_image.data, image_width_, image_height_, QImage::Format_BGR888);
+#endif // process image
+
                     QPixmap pix_map = QPixmap::fromImage(image);
                     ui->ImageView->setPixmap(pix_map);
-                    cout << clock_time.clockMs() << "ms" << endl;
+//                    cv::imshow("image", cv_image);
+//                    cout << "cv" << endl;
+//                    cv::waitKey(10);
+//                    image_process_
+#endif // LOCAL_IMAGE_PROCESS
                 }
                 image_data[image_data_i_] = u_data;
 
@@ -270,4 +302,21 @@ void MainWindow::on_SendDataButton_clicked()
 void MainWindow::on_ConectComboBox_currentTextChanged(const QString &arg1)
 {
     current_ip_ = arg1.toStdString();
+}
+
+
+void MainWindow::on_turnLeftButton_clicked()
+{
+    int distance = ui->distanceSpinBox->value();
+    distance = distance <= MAX_TURN_DISTANCE ? distance : MAX_TURN_DISTANCE;
+
+    image_socket_->writeData(current_ip_, turn_left_data, distance);
+}
+
+void MainWindow::on_turnRightButton_clicked()
+{
+    int distance = ui->distanceSpinBox->value();
+    distance = distance <= MAX_TURN_DISTANCE ? distance : MAX_TURN_DISTANCE;
+
+    image_socket_->writeData(current_ip_, turn_right_data, distance);
 }

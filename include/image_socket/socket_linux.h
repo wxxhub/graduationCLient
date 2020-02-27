@@ -36,6 +36,7 @@ private:
     std::map<std::string, int> clients_;
 
     void acceptThread();
+    void reciveThread();
 };
 
 }

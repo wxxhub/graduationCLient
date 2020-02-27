@@ -64,13 +64,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QProgressBar" name="ImageProgressBar">
-        <property name="value">
-         <number>24</number>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QLabel" name="PreView">
         <property name="minimumSize">
          <size>
@@ -385,20 +378,30 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
-            <widget class="QPushButton" name="pushButton_2">
+            <widget class="QPushButton" name="turnLeftButton">
              <property name="text">
               <string>左转</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton">
+            <widget class="QSpinBox" name="distanceSpinBox"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="turnRightButton">
              <property name="text">
               <string>右转</string>
              </property>
             </widget>
            </item>
           </layout>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_3">
+           <property name="text">
+            <string>PushButton</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_4">

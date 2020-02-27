@@ -86,4 +86,10 @@ void SocketLinux::acceptThread() {
     }
 }
 
+void SocketLinux::reciveThread() {
+    while (is_open_) {
+
+    }
+}
+
 #endif // defined (linux)
