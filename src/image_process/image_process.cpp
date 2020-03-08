@@ -1,4 +1,4 @@
-#include "../../include/image_process/image_process.h"
+#include "image_process/image_process.h"
 
 using namespace tf_image_process;
 using namespace cv;

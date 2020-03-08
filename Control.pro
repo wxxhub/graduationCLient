@@ -21,31 +21,47 @@ DEFINES += QT_DEPRECATED_WARNINGS
 INCLUDEPATH = "./include/"
 
 SOURCES += \
+    src/face_detector/add_face.cpp \
+    src/face_detector/face_detector.cpp \
+    src/face_detector/face_mat_process.cpp \
     src/image_process/image_process.cpp \
     src/image_socket/image_socket.cpp \
     src/image_socket/socket_linux.cpp \
     src/image_socket/socket_windows.cpp \
     src/main.cpp \
+    src/mtnn/comm_lib.cpp \
+    src/mtnn/tensorflow_mtcnn.cpp \
+    src/mtnn/utils.cpp \
     src/port/port_handler.cpp \
     src/port/port_handler_linux.cpp \
     src/port/port_handler_windows.cpp \
+    src/ui/add_face_window.cpp \
     src/ui/mainwindow.cpp
 
 HEADERS += \
     include/define.h \
+    include/face_detector/add_face.h \
+    include/face_detector/face_detector.h \
+    include/face_detector/face_mat_process.h \
     include/image_process/image_process.h \
     include/image_socket/image_socket.h \
     include/image_socket/image_socket_define.h \
     include/image_socket/socket_linux.h \
     include/image_socket/socket_windows.h \
+    include/mtnn/comm_lib.hpp \
+    include/mtnn/mtcnn.hpp \
+    include/mtnn/tensorflow_mtcnn.hpp \
+    include/mtnn/utils.hpp \
     include/port/port_define.h \
     include/port/port_handler_linux.h \
     include/port/port_handler_windows.h \
+    include/ui/add_face_window.h \
     include/ui/mainwindow.h \
     include/port/port_handler.h \
     include/timer.h
 
 FORMS += \
+    ui/add_face_window.ui \
     ui/mainwindow.ui
 
 TRANSLATIONS += \
@@ -60,6 +76,7 @@ win64:{
 linux:{
 INCLUDEPATH += /home/wxx/lib/OpenCV4.2.0-gpu/include/opencv4 \
                /home/wxx/lib/OpenCV4.2.0-gpu/include/opencv4/opencv2 \
+               /home/wxx/lib/tensorflow/include \
 
 LIBS += /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_highgui.so \
         /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_core.so \
@@ -69,6 +86,8 @@ LIBS += /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_highgui.so \
         /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_video.so \
         /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_videoio.so \
         /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_dnn.so \
+        /home/wxx/lib/tensorflow/lib/libtensorflow.so \
+        /home/wxx/lib/tensorflow/lib/libtensorflow_framework.so \
 }
 
 # Default rules for deployment.

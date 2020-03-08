@@ -299,24 +299,28 @@ void MainWindow::on_SendDataButton_clicked()
     }
 }
 
-void MainWindow::on_ConectComboBox_currentTextChanged(const QString &arg1)
-{
+void MainWindow::on_ConectComboBox_currentTextChanged(const QString &arg1) {
     current_ip_ = arg1.toStdString();
 }
 
 
-void MainWindow::on_turnLeftButton_clicked()
-{
+void MainWindow::on_turnLeftButton_clicked() {
     int distance = ui->distanceSpinBox->value();
     distance = distance <= MAX_TURN_DISTANCE ? distance : MAX_TURN_DISTANCE;
 
     image_socket_->writeData(current_ip_, turn_left_data, distance);
 }
 
-void MainWindow::on_turnRightButton_clicked()
-{
+void MainWindow::on_turnRightButton_clicked() {
     int distance = ui->distanceSpinBox->value();
     distance = distance <= MAX_TURN_DISTANCE ? distance : MAX_TURN_DISTANCE;
 
     image_socket_->writeData(current_ip_, turn_right_data, distance);
+}
+
+void MainWindow::on_InputFace_clicked() {
+    if (add_face_window == nullptr) {
+        add_face_window = new AddFaceWindow();
+        add_face_window->show();
+    }
 }

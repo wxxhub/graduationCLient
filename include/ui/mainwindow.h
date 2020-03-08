@@ -9,6 +9,8 @@
 #include "port/port_handler.h"
 #include "image_socket/image_socket.h"
 
+#include "ui/add_face_window.h"
+
 #ifdef LOCAL_IMAGE_PROCESS
 #include "image_process/image_process.h"
 #endif // LOCAL_IMAGE_PROCESS
@@ -50,6 +52,8 @@ private slots:
 
     void on_turnRightButton_clicked();
 
+    void on_InputFace_clicked();
+
 private:
     Ui::MainWindow *ui;
     port_control::PortHandler *port_handler_;
@@ -72,8 +76,11 @@ private:
 
     DataState current_state_;
     std::string current_ip_;
+
+    AddFaceWindow *add_face_window = nullptr;
+
 #ifdef LOCAL_IMAGE_PROCESS
-    tf_image_process::ImageProcess *image_process_;
+    tf_image_process::ImageProcess *image_process_ ;
 #endif // LOCAL_IMAGE_PROCESS
 };
 #endif // MAINWINDOW_H
