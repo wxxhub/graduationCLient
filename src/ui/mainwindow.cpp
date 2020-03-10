@@ -7,6 +7,8 @@
 #include "ui_mainwindow.h"
 #include "timer.h"
 
+#include "face_detector/face_mat_process.h"
+
 using namespace std;
 
 const int MAX_TURN_DISTANCE = 50;
@@ -19,17 +21,16 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , image_width_(320)
     , image_height_(240)
-    , current_state_(CLOSE){
+    , current_state_(CLOSE) {
 
     ui_running_ = true;
     switch_button_state_ = false;
-
-    port_handler_ = port_control::PortHandler::getPortHandler();
-    image_socket_ = image_socket::ImageSocket::getSocketHandler();
-    port_read_thread_ = std::thread(&MainWindow::portReadThread, this);
+    show_detector_result_ = false;
 
     ui->setupUi(this);
 
+    face_detector_ = new FaceDetector();
+    identity_authencation_ = new IdentityAuthencation();
     init();
     update();
 }
@@ -55,6 +56,21 @@ void MainWindow::update() {
 }
 
 void MainWindow::init() {
+    if(!face_detector_->init("/home/wxx/Project/c++/face_detector/models/mtcnn_frozen_model.pb")) {
+        QMessageBox::warning(this, "错误", "加载mtnn模型失败！");
+    }
+
+    if(!identity_authencation_->init("/home/wxx/Project/c++/face_detector/models/face_data.xml", "/home/wxx/Project/c++/face_detector/models/labels.txt")) {
+        QMessageBox::warning(this, "错误", "加载人脸数据失败！");
+    }
+
+    // 连接信号槽
+#if (QT_VERSION <= QT_VERSION_CHECK(5,0,0))
+    connect(this, SIGNAL(reciveImage(Mat)), this, SLOT(process(Mat)));
+#else
+    connect(this, &MainWindow::reciveImage, this, &MainWindow::process);
+#endif
+
 #ifdef LOCAL_IMAGE_PROCESS
     image_process_ = new tf_image_process::ImageProcess("/home/wxx/Project/TensorflowTest/c_test/ssd_inception_v2_coco_2017_11_17/frozen_inference_graph.pb",
                                                         "/home/wxx/Project/TensorflowTest/c_test/ssd_inception_v2_coco_2017_11_17/test.pbtxt");
@@ -86,11 +102,6 @@ void MainWindow::init() {
         ui->baudrateComboBox->addItem(QString::number(*iter));
    }
 
-   // init image
-   QImage image("C:\\Users\\wxx\\Pictures\\Screenshots\\屏幕截图(1).png");
-   QPixmap pix_map = QPixmap::fromImage(image);
-   ui->ImageView->setPixmap(pix_map);
-
    // distance spinBox init
    ui->distanceSpinBox->setPrefix("旋转步长");
    ui->distanceSpinBox->setMinimum(1);
@@ -99,6 +110,36 @@ void MainWindow::init() {
        turn_left_data[i] = 'l';
        turn_right_data[i] = 'r';
    }
+
+   port_handler_ = port_control::PortHandler::getPortHandler();
+   image_socket_ = image_socket::ImageSocket::getSocketHandler();
+   port_read_thread_ = std::thread(&MainWindow::portReadThread, this);
+
+   // button init
+   resetShowResultButton();
+}
+
+void MainWindow::process() {
+    cv::Mat process_image = recive_mat_.clone();
+    vector<face_box> boxs = face_detector_->detector(process_image);
+    int boxs_size = boxs.size();
+
+    for (int i = 0; i < boxs_size; i++) {
+        cv::Mat detector_mat;
+        getDetectorMat(process_image, detector_mat, boxs[i]);
+        string detector_result = identity_authencation_->detector(detector_mat);
+        if (show_detector_result_) {
+            putText(detector_mat, detector_result, cv::Point(boxs[i].x0, boxs[i].y0), cv::FONT_HERSHEY_COMPLEX, 1,  cv::Scalar(0, 255, 0));
+        }
+    }
+    if (show_detector_result_) {
+        face_detector_->drawBox(process_image, boxs);
+    }
+
+    QImage q_image(process_image.data, image_width_, image_height_, QImage::Format_BGR888);
+    QPixmap pix_map = QPixmap::fromImage(q_image);
+    ui->ImageView->setPixmap(pix_map);
+
 }
 
 void MainWindow::portReadThread() {
@@ -165,43 +206,21 @@ void MainWindow::socketReadThread() {
                 if (u_data == 0XFF) { // update image
                     image_data_i_ = 0;
                     cout << clock_time.clockMs() << "ms" << endl;
-#ifdef LOCAL_IMAGE_PROCESS
                     cv::Mat cv_image = cv::Mat(image_height_,image_width_, CV_8UC1, image_data);
-                    cv::Mat rgb_image;
-                    cvtColor(cv_image,rgb_image,CV_GRAY2BGR);
+                    cvtColor(cv_image, recive_mat_, CV_GRAY2BGR);
+                    emit reciveImage();
 
-#if 0
-                    cv::Mat result_image = image_process_->process(rgb_image);
-                    QImage image(result_image.data, image_width_, image_height_, QImage::Format_BGR888);
-#else
-                    QImage image(rgb_image.data, image_width_, image_height_, QImage::Format_BGR888);
-#endif // process image
+                    cout << "emit reciveImage(rgb_image);" << endl;
 
-                    QPixmap pix_map = QPixmap::fromImage(image);
-                    ui->ImageView->setPixmap(pix_map);
+//                    QPixmap pix_map = QPixmap::fromImage(image);
+//                    ui->ImageView->setPixmap(pix_map);
 //                    cv::imshow("image", cv_image);
 //                    cout << "cv" << endl;
 //                    cv::waitKey(10);
 //                    image_process_
-#endif // LOCAL_IMAGE_PROCESS
                 }
                 image_data[image_data_i_] = u_data;
-
-//                if (image_data_i_ % 100 == 0) {
-//                    int value = image_data_i_ * 100 / size;
-//                    if (value < 100) {
-//                        ui->ImageProgressBar->setValue(value);
-//                    }
-
-//                    ui->readDataText->insertPlainText(QString(cache.c_str()));
-//                    ui->readDataText->moveCursor(QTextCursor::End);
-
-//                    cache = "";
-//                }
                 image_data_i_++;
-//                char code[4] = {'0', '0'};
-//                sprintf(code, "%2x\n", int(*data));
-//                cache += code;
             }
         }
     }
@@ -322,5 +341,15 @@ void MainWindow::on_InputFace_clicked() {
     if (add_face_window == nullptr) {
         add_face_window = new AddFaceWindow();
         add_face_window->show();
+    }
+}
+
+void MainWindow::resetShowResultButton() {
+    show_detector_result_ = !show_detector_result_;
+
+    if (show_detector_result_) {
+        ui->ShowResultButton->setText("关闭显示识别结果");
+    } else {
+        ui->ShowResultButton->setText("显示识别结果");
     }
 }

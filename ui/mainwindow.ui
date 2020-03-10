@@ -39,9 +39,6 @@
        <enum>QLayout::SetMinimumSize</enum>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2"/>
-      </item>
-      <item>
        <widget class="QLabel" name="ImageView">
         <property name="minimumSize">
          <size>
@@ -62,6 +59,9 @@
         </property>
         <property name="textFormat">
          <enum>Qt::MarkdownText</enum>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -396,6 +396,13 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ShowResultButton">
+        <property name="text">
+         <string>显示识别结果</string>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="verticalSpacer">

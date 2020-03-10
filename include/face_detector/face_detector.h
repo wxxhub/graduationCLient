@@ -20,6 +20,7 @@ public:
 
     bool init(const std::string &model_path);
     std::vector<face_box> detector(cv::Mat &image);
+    void drawBox(cv::Mat &image, std::vector<face_box> &boxs);
 
 private:
     const int detector_width_;

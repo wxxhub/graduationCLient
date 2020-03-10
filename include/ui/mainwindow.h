@@ -8,6 +8,8 @@
 
 #include "port/port_handler.h"
 #include "image_socket/image_socket.h"
+#include "face_detector/face_detector.h"
+#include "face_detector/identity_authencation.h"
 
 #include "ui/add_face_window.h"
 
@@ -35,6 +37,9 @@ public:
     void update();
     void init();
 
+signals:
+    void reciveImage();
+
 private slots:
     void on_SwitchButton_clicked();
 
@@ -54,6 +59,8 @@ private slots:
 
     void on_InputFace_clicked();
 
+    void process();
+
 private:
     Ui::MainWindow *ui;
     port_control::PortHandler *port_handler_;
@@ -68,6 +75,7 @@ private:
     void addIP(const char* ip);
     void changeState(DataState state);
     bool ui_running_;
+    bool show_detector_result_;
 
     int image_data_i_;  //记录图像数据位
 
@@ -78,9 +86,16 @@ private:
     std::string current_ip_;
 
     AddFaceWindow *add_face_window = nullptr;
+    cv::Mat recive_mat_;
+
+    FaceDetector *face_detector_;
+    IdentityAuthencation *identity_authencation_;
+
+    void resetShowResultButton();
 
 #ifdef LOCAL_IMAGE_PROCESS
     tf_image_process::ImageProcess *image_process_ ;
 #endif // LOCAL_IMAGE_PROCESS
+
 };
 #endif // MAINWINDOW_H

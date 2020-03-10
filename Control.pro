@@ -24,6 +24,7 @@ SOURCES += \
     src/face_detector/add_face.cpp \
     src/face_detector/face_detector.cpp \
     src/face_detector/face_mat_process.cpp \
+    src/face_detector/identity_authencation.cpp \
     src/image_process/image_process.cpp \
     src/image_socket/image_socket.cpp \
     src/image_socket/socket_linux.cpp \
@@ -43,6 +44,7 @@ HEADERS += \
     include/face_detector/add_face.h \
     include/face_detector/face_detector.h \
     include/face_detector/face_mat_process.h \
+    include/face_detector/identity_authencation.h \
     include/image_process/image_process.h \
     include/image_socket/image_socket.h \
     include/image_socket/image_socket_define.h \
@@ -86,6 +88,7 @@ LIBS += /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_highgui.so \
         /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_video.so \
         /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_videoio.so \
         /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_dnn.so \
+        /home/wxx/lib/OpenCV4.2.0-gpu/lib/libopencv_ml.so \
         /home/wxx/lib/tensorflow/lib/libtensorflow.so \
         /home/wxx/lib/tensorflow/lib/libtensorflow_framework.so \
 }

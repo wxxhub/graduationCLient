@@ -32,3 +32,16 @@ std::vector<face_box> FaceDetector::detector(cv::Mat &image) {
 
     return  face_info;
 }
+
+void FaceDetector::drawBox(cv::Mat &image, std::vector<face_box> &boxs) {
+    for(unsigned int i = 0; i < boxs.size(); i++) {
+        face_box& box = boxs[i];
+
+        /*draw box */
+        rectangle(image, Point(box.x0, box.y0), Point(box.x1, box.y1), Scalar(0, 255, 0), 1);
+
+        for(int l=0;l<5;l++) {
+            circle(image,Point(box.landmark.x[l],box.landmark.y[l]),1,Scalar(0, 0, 255),2);
+        }
+    }
+}
