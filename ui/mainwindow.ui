@@ -9,14 +9,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>970</width>
-    <height>540</height>
+    <width>892</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>970</width>
-    <height>540</height>
+    <width>800</width>
+    <height>600</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -42,8 +42,8 @@
        <widget class="QLabel" name="ImageView">
         <property name="minimumSize">
          <size>
-          <width>480</width>
-          <height>420</height>
+          <width>400</width>
+          <height>300</height>
          </size>
         </property>
         <property name="autoFillBackground">
@@ -405,6 +405,32 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="TipsLabel">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background: rgb(115, 210, 22);</string>
+        </property>
+        <property name="text">
+         <string>情况提示</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="InfoManagerButton">
+        <property name="text">
+         <string>信息管理</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -458,7 +484,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>970</width>
+     <width>892</width>
      <height>28</height>
     </rect>
    </property>

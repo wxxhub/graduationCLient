@@ -44,6 +44,9 @@ private:
 
     QStandardItemModel *preview_model_;
     int set_item_index_ = 0;
+
+signals:
+    void closeSignal();
 };
 
 #endif // ADD_FACE_WINDOW_H

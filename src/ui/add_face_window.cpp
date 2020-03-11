@@ -7,8 +7,12 @@
 #include <QString>
 #include <QTableWidget>
 
+#include <mutex>
+
 using namespace std;
 using namespace cv;
+
+mutex running_mutex_;
 
 AddFaceWindow::AddFaceWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,13 +21,20 @@ AddFaceWindow::AddFaceWindow(QWidget *parent)
     , image_height_(480) {
 
     setAttribute(Qt::WA_DeleteOnClose);
+
     ui->setupUi(this);
     init();
 }
 
 AddFaceWindow::~AddFaceWindow() {
+    running_mutex_.lock();
     running_ = false;
+    running_mutex_.unlock();
+
     capture_thread_.join();
+
+    preview_model_->clear();
+    emit closeSignal();
     delete ui;
 }
 
@@ -51,7 +62,8 @@ void AddFaceWindow::captureThread() {
     Mat frame;
 
     while (running_) {
-        capture.read(frame);
+        running_mutex_.unlock();
+        capture >> frame;
 
         if (add_face_->process(frame)) {
 
@@ -74,9 +86,11 @@ void AddFaceWindow::captureThread() {
         QImage image(frame.data, frame.cols, frame.rows, QImage::Format_BGR888);
         QPixmap pix_map = QPixmap::fromImage(image);
         ui->CaptureView->setPixmap(pix_map);
+
+        running_mutex_.lock();
     }
 
-    waitKey(1);
+    capture.release();
 }
 
 void AddFaceWindow::on_SaveButton_clicked() {

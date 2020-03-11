@@ -331,10 +331,31 @@ void MainWindow::on_turnRightButton_clicked() {
     image_socket_->writeData(current_ip_, turn_right_data, distance);
 }
 
+void MainWindow::addFaceWindowClose() {
+    add_face_window_ = nullptr;
+}
+
+void MainWindow::controlWindowClose() {
+    control_window_ = nullptr;
+}
+
 void MainWindow::on_InputFace_clicked() {
-    if (add_face_window == nullptr) {
-        add_face_window = new AddFaceWindow();
-        add_face_window->show();
+    if (add_face_window_ == nullptr) {
+        add_face_window_ = new AddFaceWindow();
+        connect(add_face_window_, &AddFaceWindow::closeSignal, this, &MainWindow::addFaceWindowClose);
+        add_face_window_->show();
+    } else {
+        add_face_window_->show();
+    }
+}
+
+void MainWindow::on_InfoManagerButton_clicked() {
+    if (control_window_ == nullptr) {
+        control_window_ = new ControlWindow();
+        connect(control_window_, &ControlWindow::closeSignal, this, &MainWindow::controlWindowClose);
+        control_window_->show();
+    } else {
+        control_window_->show();
     }
 }
 
@@ -351,3 +372,4 @@ void MainWindow::resetShowResultButton() {
 void MainWindow::on_ShowResultButton_clicked() {
     resetShowResultButton();
 }
+

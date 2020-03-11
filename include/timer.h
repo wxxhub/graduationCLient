@@ -26,6 +26,7 @@ private:
 };
 #elif defined (linux)
 #include <time.h>
+//#include <unistd.h>
 class ClockTime {
 public:
     void reset() {
@@ -52,6 +53,8 @@ private:
 void sleep_ms(int time) {
 #if defined (_WIN32) || defined (_WIN64)
     Sleep(time);
+#elif defined (linux)
+//    usleep(time * 1000);
 #else
     #pragma message("Have't adpter yout system...")
 #endif

@@ -12,6 +12,7 @@
 #include "face_detector/identity_authencation.h"
 
 #include "ui/add_face_window.h"
+#include "ui/control_window.h"
 
 #ifdef LOCAL_IMAGE_PROCESS
 #include "image_process/image_process.h"
@@ -63,6 +64,11 @@ private slots:
 
     void on_ShowResultButton_clicked();
 
+    void addFaceWindowClose();
+    void controlWindowClose();
+
+    void on_InfoManagerButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     port_control::PortHandler *port_handler_;
@@ -87,7 +93,8 @@ private:
     DataState current_state_;
     std::string current_ip_;
 
-    AddFaceWindow *add_face_window = nullptr;
+    AddFaceWindow *add_face_window_ = nullptr;
+    ControlWindow *control_window_ = nullptr;
     cv::Mat recive_mat_;
 
     FaceDetector *face_detector_;

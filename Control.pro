@@ -37,7 +37,8 @@ SOURCES += \
     src/port/port_handler_linux.cpp \
     src/port/port_handler_windows.cpp \
     src/ui/add_face_window.cpp \
-    src/ui/mainwindow.cpp
+    src/ui/mainwindow.cpp \
+    src/ui/control_window.cpp
 
 HEADERS += \
     include/define.h \
@@ -58,12 +59,14 @@ HEADERS += \
     include/port/port_handler_linux.h \
     include/port/port_handler_windows.h \
     include/ui/add_face_window.h \
+    include/ui/control_window.h \
     include/ui/mainwindow.h \
     include/port/port_handler.h \
     include/timer.h
 
 FORMS += \
     ui/add_face_window.ui \
+    ui/control_window.ui \
     ui/mainwindow.ui
 
 TRANSLATIONS += \
