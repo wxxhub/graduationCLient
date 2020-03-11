@@ -128,8 +128,10 @@ void MainWindow::process() {
         cv::Mat detector_mat;
         getDetectorMat(process_image, detector_mat, boxs[i]);
         string detector_result = identity_authencation_->detector(detector_mat);
+//        cout << detector_result << endl;
         if (show_detector_result_) {
-            putText(detector_mat, detector_result, cv::Point(boxs[i].x0, boxs[i].y0), cv::FONT_HERSHEY_COMPLEX, 1,  cv::Scalar(0, 255, 0));
+//            cout << "putText" << endl;
+            putText(process_image, detector_result, cv::Point(boxs[i].x0, boxs[i].y0), cv::FONT_HERSHEY_COMPLEX, 1,  cv::Scalar(0, 255, 0));
         }
     }
     if (show_detector_result_) {
@@ -197,12 +199,12 @@ void MainWindow::socketReadThread() {
     cout << "socketReadThread" << endl;
     while (ui_running_ && current_state_ == SERVER) {
         if (image_socket_->isOpen()) {
-//           cout << "[" << current_ip_ << "]" << endl;
+
             char data;
-//            cout << "image_socket_->isOpen()" << endl;
+
             if(image_socket_->readOneData(current_ip_, &data) > 0) {
                 uint8_t u_data = 0XFF & data;
-//                cout << int(u_data) << endl;
+
                 if (u_data == 0XFF) { // update image
                     image_data_i_ = 0;
                     cout << clock_time.clockMs() << "ms" << endl;
@@ -210,14 +212,6 @@ void MainWindow::socketReadThread() {
                     cvtColor(cv_image, recive_mat_, CV_GRAY2BGR);
                     emit reciveImage();
 
-                    cout << "emit reciveImage(rgb_image);" << endl;
-
-//                    QPixmap pix_map = QPixmap::fromImage(image);
-//                    ui->ImageView->setPixmap(pix_map);
-//                    cv::imshow("image", cv_image);
-//                    cout << "cv" << endl;
-//                    cv::waitKey(10);
-//                    image_process_
                 }
                 image_data[image_data_i_] = u_data;
                 image_data_i_++;
@@ -352,4 +346,8 @@ void MainWindow::resetShowResultButton() {
     } else {
         ui->ShowResultButton->setText("显示识别结果");
     }
+}
+
+void MainWindow::on_ShowResultButton_clicked() {
+    resetShowResultButton();
 }

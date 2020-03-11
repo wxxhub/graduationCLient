@@ -61,6 +61,8 @@ private slots:
 
     void process();
 
+    void on_ShowResultButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     port_control::PortHandler *port_handler_;
