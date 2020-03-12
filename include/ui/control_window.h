@@ -59,11 +59,18 @@ private:
 
     void updateSpecialPersonModel();
     void addSpecialPeronData(QString id, QString name, QString remark, QString image_path);
+
+    void updatePassingInfoModel();
+    void updateExceptionCaseModel();
 signals:
     void closeSignal();
 private slots:
     void on_AddCommunityPersonButton_clicked();
     void on_SpecialPersonAddButton_clicked();
+    void on_PassingInfoUpdateButton_clicked();
+    void on_ExceptionCaseUpdateButton_clicked();
+    void on_SpecialPersonUpdateButton_clicked();
+    void on_CommunityPersonUpdateButton_clicked();
 };
 
 #endif // CONTROL_WINDOW_H

@@ -43,6 +43,21 @@ ControlWindow::ControlWindow(QWidget *parent) :
     special_peronnel_model_->setHeaderData(3, Qt::Horizontal,QString::fromLocal8Bit("备注"));
     special_peronnel_model_->setHeaderData(4, Qt::Horizontal,QString::fromLocal8Bit("照片"));
 
+    passing_info_model_ = new QStandardItemModel();
+    passing_info_model_->setColumnCount(4);
+    passing_info_model_->setHeaderData(0, Qt::Horizontal,QString::fromLocal8Bit("ID"));
+    passing_info_model_->setHeaderData(1, Qt::Horizontal,QString::fromLocal8Bit("姓名"));
+    passing_info_model_->setHeaderData(2, Qt::Horizontal,QString::fromLocal8Bit("时间"));
+    passing_info_model_->setHeaderData(3, Qt::Horizontal,QString::fromLocal8Bit("照片"));
+
+    exception_case_model_ = new QStandardItemModel();
+    exception_case_model_->setColumnCount(5);
+    exception_case_model_->setHeaderData(0, Qt::Horizontal,QString::fromLocal8Bit("ID"));
+    exception_case_model_->setHeaderData(1, Qt::Horizontal,QString::fromLocal8Bit("姓名"));
+    exception_case_model_->setHeaderData(2, Qt::Horizontal,QString::fromLocal8Bit("时间"));
+    exception_case_model_->setHeaderData(3, Qt::Horizontal,QString::fromLocal8Bit("备注"));
+    exception_case_model_->setHeaderData(4, Qt::Horizontal,QString::fromLocal8Bit("照片"));
+
     updateTable();
     ui->setupUi(this);
 
@@ -53,9 +68,18 @@ ControlWindow::ControlWindow(QWidget *parent) :
     ui->SpecialPersonnelTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->SpecialPersonnelTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    ui->PassingInfoTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->PassingInfoTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    ui->ExceptionalCaselTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->ExceptionalCaselTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
     // set model
     ui->CommunityPersonnelTable->setModel(community_personnel_model_);
     ui->SpecialPersonnelTable->setModel(special_peronnel_model_);
+    ui->PassingInfoTable->setModel(passing_info_model_);
+    ui->ExceptionalCaselTable->setModel(exception_case_model_);
+
 }
 
 ControlWindow::~ControlWindow() {
@@ -113,6 +137,9 @@ void ControlWindow::checkFile() {
 
 void ControlWindow::updateTable() {
     updateCommunityPersonnelModel();
+    updateSpecialPersonModel();
+    updatePassingInfoModel();
+    updateExceptionCaseModel();
 }
 
 void ControlWindow::updateCommunityPersonnelModel() {
@@ -214,4 +241,93 @@ void ControlWindow::on_SpecialPersonAddButton_clicked() {
     QString image_path = ui->SpecialPersonImagePath->text();
 
     addSpecialPeronData(id, name, remark, image_path);
+}
+
+void ControlWindow::updateSpecialPersonModel() {
+    special_peronnel_model_->clear();
+
+    QFile file(special_peronnel_file_.c_str());
+    file.open(QIODevice::ReadWrite);
+    QByteArray data = file.readAll();
+
+    //使用json文件对象加载字符串
+    QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+    QJsonArray json_array = json_doc.array();
+
+    int size = json_array.size();
+    for (int i = 0; i < size; i++) {
+        special_peronnel_model_->setItem(i, 1, new QStandardItem(json_array.at(i)["id"].toString()));
+        special_peronnel_model_->setItem(i, 2, new QStandardItem(json_array.at(i)["name"].toString()));
+        special_peronnel_model_->setItem(i, 3, new QStandardItem(json_array.at(i)["remark"].toString()));
+        special_peronnel_model_->setItem(i, 4, new QStandardItem(json_array.at(i)["image_path"].toString()));
+
+    }
+
+    file.close();
+}
+
+void ControlWindow::updatePassingInfoModel() {
+    passing_info_model_->clear();
+
+    QFile file(passing_info_file_.c_str());
+    file.open(QIODevice::ReadWrite);
+    QByteArray data = file.readAll();
+
+    //使用json文件对象加载字符串
+    QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+    QJsonArray json_array = json_doc.array();
+
+    int size = json_array.size();
+    for (int i = 0; i < size; i++) {
+        passing_info_model_->setItem(i, 0, new QStandardItem(json_array.at(i)["id"].toString()));
+        passing_info_model_->setItem(i, 1, new QStandardItem(json_array.at(i)["name"].toString()));
+        passing_info_model_->setItem(i, 2, new QStandardItem(json_array.at(i)["time"].toString()));
+        passing_info_model_->setItem(i, 3, new QStandardItem(json_array.at(i)["image_path"].toString()));
+
+    }
+
+    file.close();
+}
+
+void ControlWindow::updateExceptionCaseModel() {
+    exception_case_model_->clear();
+
+    QFile file(exception_case_file_.c_str());
+    file.open(QIODevice::ReadWrite);
+    QByteArray data = file.readAll();
+
+    //使用json文件对象加载字符串
+    QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+    QJsonArray json_array = json_doc.array();
+
+    int size = json_array.size();
+    for (int i = 0; i < size; i++) {
+        exception_case_model_->setItem(i, 0, new QStandardItem(json_array.at(i)["id"].toString()));
+        exception_case_model_->setItem(i, 1, new QStandardItem(json_array.at(i)["name"].toString()));
+        exception_case_model_->setItem(i, 2, new QStandardItem(json_array.at(i)["time"].toString()));
+        exception_case_model_->setItem(i, 3, new QStandardItem(json_array.at(i)["remark"].toString()));
+        exception_case_model_->setItem(i, 4, new QStandardItem(json_array.at(i)["image_path"].toString()));
+
+    }
+
+    file.close();
+}
+
+void ControlWindow::on_CommunityPersonUpdateButton_clicked() {
+    updateCommunityPersonnelModel();
+}
+
+void ControlWindow::on_SpecialPersonUpdateButton_clicked() {
+    updateSpecialPersonModel();
+}
+
+void ControlWindow::on_PassingInfoUpdateButton_clicked() {
+     updatePassingInfoModel();
+}
+
+void ControlWindow::on_ExceptionCaseUpdateButton_clicked() {
+    updateExceptionCaseModel();
 }
