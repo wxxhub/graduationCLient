@@ -5,11 +5,14 @@
 
 #include <thread>
 #include <QMainWindow>
+#include <QTime>
 
 #include "port/port_handler.h"
 #include "image_socket/image_socket.h"
 #include "face_detector/face_detector.h"
 #include "face_detector/identity_authencation.h"
+#include "info_process/info_process.h"
+#include "define.h"
 
 #include "ui/add_face_window.h"
 #include "ui/control_window.h"
@@ -26,6 +29,16 @@ enum DataState {
     CLOSE = -1,
     PORT = 0,
     SERVER = 1,
+};
+
+enum SoundType {
+    SPECIAL_PERSON_SOUND = 0,
+    UNKNOWN_PERSON_SOUND = 1,
+};
+
+struct PASSING_DATA {
+    PersonInfo info;
+    QTime time;
 };
 
 class MainWindow : public QMainWindow {
@@ -69,6 +82,8 @@ private slots:
 
     void on_InfoManagerButton_clicked();
 
+    void on_ResetTipsButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     port_control::PortHandler *port_handler_;
@@ -100,8 +115,21 @@ private:
     FaceDetector *face_detector_;
     IdentityAuthencation *identity_authencation_;
 
+    InfoProcess *info_process_;
     void resetShowResultButton();
 
+    std::string community_person_sound_;
+    std::string special_person_sound_;
+    std::string passing_info_file_;
+    std::string special_case_file_;
+
+    void playSound(SoundType type);
+    void personManage(std::string id);
+    void updatePassingInfo(PersonInfo info, std::string id);
+
+    void addPassingInfo(Person person);
+    void addSpecialCase(SpecialPerson special_person);
+    PASSING_DATA last_passing_info_;
 #ifdef LOCAL_IMAGE_PROCESS
     tf_image_process::ImageProcess *image_process_ ;
 #endif // LOCAL_IMAGE_PROCESS

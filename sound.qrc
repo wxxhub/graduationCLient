@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>voice/alarm.wav</file>
+        <file>voice/special_person.wav</file>
+        <file>voice/unknown_person.wav</file>
+    </qresource>
+</RCC>

@@ -398,11 +398,22 @@
        </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="ShowResultButton">
-        <property name="text">
-         <string>显示识别结果</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QPushButton" name="ShowResultButton">
+          <property name="text">
+           <string>显示识别结果</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="InfoManagerButton">
+          <property name="text">
+           <string>信息管理</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QLabel" name="TipsLabel">
@@ -424,9 +435,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="InfoManagerButton">
+       <widget class="QPushButton" name="ResetTipsButton">
         <property name="text">
-         <string>信息管理</string>
+         <string>特情已处理</string>
         </property>
        </widget>
       </item>

@@ -1,4 +1,5 @@
 QT       += core gui
+QT       += multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -29,6 +30,7 @@ SOURCES += \
     src/image_socket/image_socket.cpp \
     src/image_socket/socket_linux.cpp \
     src/image_socket/socket_windows.cpp \
+    src/info_process/info_process.cpp \
     src/main.cpp \
     src/mtnn/comm_lib.cpp \
     src/mtnn/tensorflow_mtcnn.cpp \
@@ -51,6 +53,7 @@ HEADERS += \
     include/image_socket/image_socket_define.h \
     include/image_socket/socket_linux.h \
     include/image_socket/socket_windows.h \
+    include/info_process/info_process.h \
     include/mtnn/comm_lib.hpp \
     include/mtnn/mtcnn.hpp \
     include/mtnn/tensorflow_mtcnn.hpp \
@@ -102,4 +105,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    README.md
+    README.md \
+
+RESOURCES += \
+    sound.qrc

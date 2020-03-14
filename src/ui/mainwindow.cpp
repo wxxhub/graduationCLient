@@ -1,7 +1,14 @@
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <iostream>
 #include <time.h>
+#include <QDateTime>
 
 #include <QMessageBox>
+#include <QtMultimedia/QSound>
+#include <QUrl>
 
 #include "ui/mainwindow.h"
 #include "ui_mainwindow.h"
@@ -31,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     face_detector_ = new FaceDetector();
     identity_authencation_ = new IdentityAuthencation();
+    info_process_ = new InfoProcess();
     init();
     update();
 }
@@ -38,6 +46,11 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() {
     ui_running_ = false;
     port_read_thread_.join();
+
+    delete face_detector_;
+    delete identity_authencation_;
+    delete info_process_;
+
 #ifdef LOCAL_IMAGE_PROCESS
     delete image_process_;
 #endif // LOCAL_IMAGE_PROCESS
@@ -56,6 +69,17 @@ void MainWindow::update() {
 }
 
 void MainWindow::init() {
+    // init pass info
+    last_passing_info_.info = COMMUNITY_PERSON;
+    last_passing_info_.time = QTime::currentTime();
+
+    // init file path
+    string applition_path =  QCoreApplication::applicationDirPath().toStdString();
+    string data_path_ = applition_path + "/data/";
+    passing_info_file_ = data_path_ + "passing_info.json";
+    special_case_file_ = data_path_ + "exception_case.json";
+
+    // init model
     if(!face_detector_->init("/home/wxx/Project/c++/face_detector/models/mtcnn_frozen_model.pb")) {
         QMessageBox::warning(this, "错误", "加载mtnn模型失败！");
     }
@@ -128,6 +152,9 @@ void MainWindow::process() {
         cv::Mat detector_mat;
         getDetectorMat(process_image, detector_mat, boxs[i]);
         string detector_result = identity_authencation_->detector(detector_mat);
+
+        personManage(detector_result);
+
 //        cout << detector_result << endl;
         if (show_detector_result_) {
 //            cout << "putText" << endl;
@@ -243,8 +270,7 @@ void changeState(DataState state) {
     }
 }
 
-void MainWindow::on_SwitchButton_clicked()
-{
+void MainWindow::on_SwitchButton_clicked() {
 //    switch_button_state_ = !switch_button_state_;
 
 //    if (switch_button_state_) {
@@ -265,18 +291,15 @@ void MainWindow::on_SwitchButton_clicked()
 //    }
 }
 
-void MainWindow::on_CleanWindowButton_clicked()
-{
+void MainWindow::on_CleanWindowButton_clicked() {
     ui->readDataText->clear();
 }
 
-void MainWindow::on_UpdateButton_clicked()
-{
+void MainWindow::on_UpdateButton_clicked() {
     update();
 }
 
-void MainWindow::on_ServerButton_clicked()
-{
+void MainWindow::on_ServerButton_clicked() {
     if (current_state_ != SERVER) {
         current_state_ = SERVER;
         if (image_socket_->initSocket()) {
@@ -289,8 +312,7 @@ void MainWindow::on_ServerButton_clicked()
     }
 }
 
-void MainWindow::on_SendDataButton_clicked()
-{
+void MainWindow::on_SendDataButton_clicked() {
     string data = ui->SendDataLine->text().toStdString();
     switch (current_state_) {
     case PORT: {
@@ -373,3 +395,139 @@ void MainWindow::on_ShowResultButton_clicked() {
     resetShowResultButton();
 }
 
+
+void MainWindow::on_ResetTipsButton_clicked() {
+    ui->TipsLabel->setStyleSheet("QLabel{background-color:rgb(115, 210, 22)}");
+}
+
+void MainWindow::playSound(SoundType type) {
+    switch (type) {
+    case SPECIAL_PERSON_SOUND:
+        QSound::play(QUrl("qrc:/voice/special_person.wav").toString());
+        break;
+
+    case UNKNOWN_PERSON_SOUND:
+        QSound::play(QUrl("qrc:/voice/unknown_person.wav").toString());
+        break;
+    }
+}
+
+void MainWindow::personManage(std::string id) {
+    // judge the identity of personnel;
+    switch (info_process_->find(id)) {
+    case SPECIAL_PERSON:
+        ui->TipsLabel->setStyleSheet("QLabel{background-color:rgb(255,0,0);}");
+        updatePassingInfo(SPECIAL_PERSON, id);
+
+        break;
+
+    case COMMUNITY_PERSON:
+        updatePassingInfo(COMMUNITY_PERSON, id);
+        break;
+
+    default:
+        ui->TipsLabel->setStyleSheet("QLabel{background-color:rgb(245, 121, 0)}");
+        updatePassingInfo(UNKNOWN_PERSON, id);
+
+        break;
+    }
+}
+
+void MainWindow::updatePassingInfo(PersonInfo info, std::string id) {
+
+    QTime current_time = QTime::currentTime();
+    cout << "time:" << last_passing_info_.time.secsTo(current_time) << endl;
+    if (info != COMMUNITY_PERSON && info == last_passing_info_.info) {
+        if (last_passing_info_.time.secsTo(current_time) < 60) {
+            return;
+        }
+    }
+
+    if (info == COMMUNITY_PERSON && info == last_passing_info_.info) {
+        if (last_passing_info_.time.secsTo(current_time) < 60) {
+            return;
+        }
+    }
+
+    last_passing_info_.info = info;
+    last_passing_info_.time = current_time;
+
+    cout << "id:" << id << endl;
+    switch (info) {
+    case COMMUNITY_PERSON: {
+        Person person = info_process_->getPerson(id);
+        addPassingInfo(person);
+        break;
+    }
+
+    case SPECIAL_PERSON: {
+        playSound(SPECIAL_PERSON_SOUND);
+        SpecialPerson special_person = info_process_->getSpecialPerson(id);
+        addSpecialCase(special_person);
+        break;
+    }
+
+    default: {
+        playSound(UNKNOWN_PERSON_SOUND);
+        SpecialPerson special_person;
+        special_person.person.id = "未知";
+        special_person.person.name = "未知";
+        special_person.remark = "数据库无此人信息";
+        addSpecialCase(special_person);
+        break;
+    }
+    }
+}
+
+void MainWindow::addPassingInfo(Person person) {
+    QDateTime time = QDateTime::currentDateTime();
+    QFile file(passing_info_file_.c_str());
+    file.open(QIODevice::ReadWrite);
+    QByteArray data = file.readAll();
+
+    //使用json文件对象加载字符串
+    QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+    QJsonArray json_array = json_doc.array();
+
+    QJsonObject person_obj;
+    person_obj.insert("id", QString(person.id.c_str()));
+    person_obj.insert("name", QString(person.name.c_str()));
+    person_obj.insert("image_path", QString(person.head_image_path.c_str()));
+    person_obj.insert("time", time.toString("yyyy.MM.dd_hh:mm_ddd"));
+
+    json_array.push_back(person_obj);
+
+    json_doc.setArray(json_array);
+
+    file.reset();
+    file.write(json_doc.toJson());
+    file.close();
+}
+
+void MainWindow::addSpecialCase(SpecialPerson special_person) {
+    QDateTime time = QDateTime::currentDateTime();
+    QFile file(special_case_file_.c_str());
+    file.open(QIODevice::ReadWrite);
+    QByteArray data = file.readAll();
+
+    //使用json文件对象加载字符串
+    QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+    QJsonArray json_array = json_doc.array();
+
+    QJsonObject special_person_obj;
+    special_person_obj.insert("id", QString(special_person.person.id.c_str()));
+    special_person_obj.insert("name", QString(special_person.person.name.c_str()));
+    special_person_obj.insert("remark", QString(special_person.remark.c_str()));
+    special_person_obj.insert("image_path", QString(special_person.person.head_image_path.c_str()));
+    special_person_obj.insert("time", time.toString("yyyy.MM.dd_hh:mm_ddd"));
+
+    json_array.push_back(special_person_obj);
+
+    json_doc.setArray(json_array);
+
+    file.reset();
+    file.write(json_doc.toJson());
+    file.close();
+}

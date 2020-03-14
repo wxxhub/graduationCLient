@@ -4,30 +4,11 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 
+#include "define.h"
+
 namespace Ui {
 class ControlWindow;
 }
-
-struct Person {
-    std::string head_image_path;
-    std::string id;
-    std::string name;
-};
-
-struct SpecialPerson {
-    Person person;
-    std::string remark;
-};
-
-struct PassingInfo {
-    Person person;
-    std::string time;
-};
-
-struct Exception {
-    SpecialPerson special_person;
-    std::string time;
-};
 
 class ControlWindow : public QMainWindow
 {
