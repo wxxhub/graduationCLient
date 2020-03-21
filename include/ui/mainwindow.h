@@ -97,6 +97,9 @@ private:
     void socketReadThread();
     void addIP(const char* ip);
     void changeState(DataState state);
+
+    void resetShowResultButton();
+
     bool ui_running_;
     bool show_detector_result_;
 
@@ -116,19 +119,25 @@ private:
     IdentityAuthencation *identity_authencation_;
 
     InfoProcess *info_process_;
-    void resetShowResultButton();
 
     std::string community_person_sound_;
     std::string special_person_sound_;
     std::string passing_info_file_;
     std::string special_case_file_;
+    std::string passing_info_image_path_;
+    std::string special_case_image_path_;
 
     void playSound(SoundType type);
-    void personManage(std::string id);
-    void updatePassingInfo(PersonInfo info, std::string id);
+    void personManage(std::string id, const cv::Mat &image);
 
-    void addPassingInfo(Person person);
-    void addSpecialCase(SpecialPerson special_person);
+    void updatePassingInfo(PersonInfo info, std::string id, const cv::Mat &image);
+
+    void addPassingInfo(Person person, const cv::Mat &image);
+    void addSpecialCase(SpecialPerson special_person, const cv::Mat &image);
+
+    std::string getUniqueName();
+    uint64 unique_index_;
+    const uint64 unique_index_range_;
     PASSING_DATA last_passing_info_;
 #ifdef LOCAL_IMAGE_PROCESS
     tf_image_process::ImageProcess *image_process_ ;

@@ -139,3 +139,4 @@ void AddFaceWindow::on_ResetButton_clicked() {
     preview_model_->clear();
     set_item_index_ = 0;
 }
+

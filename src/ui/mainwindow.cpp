@@ -5,6 +5,7 @@
 #include <iostream>
 #include <time.h>
 #include <QDateTime>
+#include <QDir>
 
 #include <QMessageBox>
 #include <QtMultimedia/QSound>
@@ -23,12 +24,15 @@ const int MAX_TURN_DISTANCE = 50;
 char turn_left_data[MAX_TURN_DISTANCE];
 char turn_right_data[MAX_TURN_DISTANCE];
 
+mutex unique_index_mutex_;
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , image_width_(320)
     , image_height_(240)
-    , current_state_(CLOSE) {
+    , current_state_(CLOSE)
+    , unique_index_range_(10000){
 
     ui_running_ = true;
     switch_button_state_ = false;
@@ -78,6 +82,33 @@ void MainWindow::init() {
     string data_path_ = applition_path + "/data/";
     passing_info_file_ = data_path_ + "passing_info.json";
     special_case_file_ = data_path_ + "exception_case.json";
+    string image_path = applition_path + "/image/";
+    passing_info_image_path_ = image_path + "passing_info/";
+    special_case_image_path_ = image_path + "special_case/";
+
+    cout << "passing_info_image_path_:" << passing_info_image_path_ << endl;
+    // check path
+    QDir check_image_path(image_path.c_str());
+    if (!check_image_path.exists()) {
+        if(!check_image_path.mkdir(image_path.c_str())) {
+            QMessageBox::warning(this, "错误", "创建image目录失败!");
+        }
+    }
+
+
+    QDir check_passing_info_image_path(passing_info_image_path_.c_str());
+    if (!check_passing_info_image_path.exists()) {
+        if(!check_passing_info_image_path.mkdir(passing_info_image_path_.c_str())) {
+            QMessageBox::warning(this, "错误", "创建passing_info_image目录失败!");
+        }
+    }
+
+    QDir check_special_case_image_path(special_case_image_path_.c_str());
+    if (!check_special_case_image_path.exists()) {
+        if(!check_special_case_image_path.mkdir(special_case_image_path_.c_str())) {
+            QMessageBox::warning(this, "错误", "创建special_case_image目录失败!");
+        }
+    }
 
     // init model
     if(!face_detector_->init("/home/wxx/Project/c++/face_detector/models/mtcnn_frozen_model.pb")) {
@@ -153,11 +184,9 @@ void MainWindow::process() {
         getDetectorMat(process_image, detector_mat, boxs[i]);
         string detector_result = identity_authencation_->detector(detector_mat);
 
-        personManage(detector_result);
+        personManage(detector_result, detector_mat);
 
-//        cout << detector_result << endl;
         if (show_detector_result_) {
-//            cout << "putText" << endl;
             putText(process_image, detector_result, cv::Point(boxs[i].x0, boxs[i].y0), cv::FONT_HERSHEY_COMPLEX, 1,  cv::Scalar(0, 255, 0));
         }
     }
@@ -412,28 +441,28 @@ void MainWindow::playSound(SoundType type) {
     }
 }
 
-void MainWindow::personManage(std::string id) {
+void MainWindow::personManage(std::string id, const cv::Mat &image) {
     // judge the identity of personnel;
     switch (info_process_->find(id)) {
     case SPECIAL_PERSON:
         ui->TipsLabel->setStyleSheet("QLabel{background-color:rgb(255,0,0);}");
-        updatePassingInfo(SPECIAL_PERSON, id);
+        updatePassingInfo(SPECIAL_PERSON, id, image);
 
         break;
 
     case COMMUNITY_PERSON:
-        updatePassingInfo(COMMUNITY_PERSON, id);
+        updatePassingInfo(COMMUNITY_PERSON, id, image);
         break;
 
     default:
         ui->TipsLabel->setStyleSheet("QLabel{background-color:rgb(245, 121, 0)}");
-        updatePassingInfo(UNKNOWN_PERSON, id);
+        updatePassingInfo(UNKNOWN_PERSON, id, image);
 
         break;
     }
 }
 
-void MainWindow::updatePassingInfo(PersonInfo info, std::string id) {
+void MainWindow::updatePassingInfo(PersonInfo info, std::string id, const cv::Mat &image) {
 
     QTime current_time = QTime::currentTime();
     cout << "time:" << last_passing_info_.time.secsTo(current_time) << endl;
@@ -452,18 +481,17 @@ void MainWindow::updatePassingInfo(PersonInfo info, std::string id) {
     last_passing_info_.info = info;
     last_passing_info_.time = current_time;
 
-    cout << "id:" << id << endl;
     switch (info) {
     case COMMUNITY_PERSON: {
         Person person = info_process_->getPerson(id);
-        addPassingInfo(person);
+        addPassingInfo(person, image);
         break;
     }
 
     case SPECIAL_PERSON: {
         playSound(SPECIAL_PERSON_SOUND);
         SpecialPerson special_person = info_process_->getSpecialPerson(id);
-        addSpecialCase(special_person);
+        addSpecialCase(special_person, image);
         break;
     }
 
@@ -473,27 +501,30 @@ void MainWindow::updatePassingInfo(PersonInfo info, std::string id) {
         special_person.person.id = "未知";
         special_person.person.name = "未知";
         special_person.remark = "数据库无此人信息";
-        addSpecialCase(special_person);
+        addSpecialCase(special_person, image);
         break;
     }
     }
 }
 
-void MainWindow::addPassingInfo(Person person) {
+void MainWindow::addPassingInfo(Person person, const cv::Mat &image) {
     QDateTime time = QDateTime::currentDateTime();
     QFile file(passing_info_file_.c_str());
     file.open(QIODevice::ReadWrite);
     QByteArray data = file.readAll();
 
+    // save image
+    std::string image_path = passing_info_image_path_ + getUniqueName() + "_.jpg";
+    cv::imwrite(image_path, image);
+
     //使用json文件对象加载字符串
     QJsonDocument json_doc = QJsonDocument::fromJson(data);
 
     QJsonArray json_array = json_doc.array();
-
     QJsonObject person_obj;
     person_obj.insert("id", QString(person.id.c_str()));
     person_obj.insert("name", QString(person.name.c_str()));
-    person_obj.insert("image_path", QString(person.head_image_path.c_str()));
+    person_obj.insert("image_path", QString(image_path.c_str()));
     person_obj.insert("time", time.toString("yyyy.MM.dd_hh:mm_ddd"));
 
     json_array.push_back(person_obj);
@@ -505,22 +536,30 @@ void MainWindow::addPassingInfo(Person person) {
     file.close();
 }
 
-void MainWindow::addSpecialCase(SpecialPerson special_person) {
+void MainWindow::addSpecialCase(SpecialPerson special_person, const cv::Mat &image) {
     QDateTime time = QDateTime::currentDateTime();
     QFile file(special_case_file_.c_str());
     file.open(QIODevice::ReadWrite);
     QByteArray data = file.readAll();
 
+    // save image
+    std::string image_path = special_case_image_path_ + getUniqueName();
+    if (special_person.person.name == "未知") {
+        image_path += "_unknown.jpg";
+    } else {
+        image_path += "_special.jpg";
+    }
+    cv::imwrite(image_path, image);
+
     //使用json文件对象加载字符串
     QJsonDocument json_doc = QJsonDocument::fromJson(data);
 
     QJsonArray json_array = json_doc.array();
-
     QJsonObject special_person_obj;
     special_person_obj.insert("id", QString(special_person.person.id.c_str()));
     special_person_obj.insert("name", QString(special_person.person.name.c_str()));
     special_person_obj.insert("remark", QString(special_person.remark.c_str()));
-    special_person_obj.insert("image_path", QString(special_person.person.head_image_path.c_str()));
+    special_person_obj.insert("image_path", QString(image_path.c_str()));
     special_person_obj.insert("time", time.toString("yyyy.MM.dd_hh:mm_ddd"));
 
     json_array.push_back(special_person_obj);
@@ -530,4 +569,15 @@ void MainWindow::addSpecialCase(SpecialPerson special_person) {
     file.reset();
     file.write(json_doc.toJson());
     file.close();
+}
+
+std::string MainWindow::getUniqueName() {
+    char name[128];
+    unique_index_mutex_.lock();
+    QDateTime time = QDateTime::currentDateTime();
+    unique_index_ = (unique_index_+1)%unique_index_range_;
+    sprintf(name, "%s_%ld", time.toString("yyyy_MM_dd_hh_mm").toStdString().c_str(), unique_index_);
+    unique_index_mutex_.unlock();
+
+    return name;
 }

@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 
+#include <set>
+
 #include "define.h"
 
 namespace Ui {
@@ -43,6 +45,9 @@ private:
 
     void updatePassingInfoModel();
     void updateExceptionCaseModel();
+
+    void deletePassingInfo(std::set<std::string> &ids);
+    void deleteExceptionCase(std::set<std::string> &ids);
 signals:
     void closeSignal();
 private slots:
@@ -52,6 +57,12 @@ private slots:
     void on_ExceptionCaseUpdateButton_clicked();
     void on_SpecialPersonUpdateButton_clicked();
     void on_CommunityPersonUpdateButton_clicked();
+    void on_SetCommunityPersonImageButton_clicked();
+    void on_SpecialPersonImageButton_clicked();
+    void on_CommunityPersonDeleteButton_clicked();
+    void on_CommunityPersonSelectAllButton_clicked();
+    void on_SpecialPersonDeleteButton_clicked();
+    void on_SpecialPersonSelectButton_clicked();
 };
 
 #endif // CONTROL_WINDOW_H

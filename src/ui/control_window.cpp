@@ -5,6 +5,9 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonParseError>
+#include <QFileDialog>
+#include <QCheckBox>
+#include <algorithm>
 
 #include "ui/control_window.h"
 #include "ui_control_window.h"
@@ -29,19 +32,17 @@ ControlWindow::ControlWindow(QWidget *parent) :
 
     // init model
     community_personnel_model_ = new QStandardItemModel();
-    community_personnel_model_->setColumnCount(4);
-    community_personnel_model_->setHeaderData(0, Qt::Horizontal,QString::fromLocal8Bit("选择"));
-    community_personnel_model_->setHeaderData(1, Qt::Horizontal,QString::fromLocal8Bit("ID"));
-    community_personnel_model_->setHeaderData(2, Qt::Horizontal,QString::fromLocal8Bit("姓名"));
-    community_personnel_model_->setHeaderData(3, Qt::Horizontal,QString::fromLocal8Bit("照片"));
+    community_personnel_model_->setColumnCount(3);
+    community_personnel_model_->setHeaderData(0, Qt::Horizontal,QString::fromLocal8Bit("ID"));
+    community_personnel_model_->setHeaderData(1, Qt::Horizontal,QString::fromLocal8Bit("姓名"));
+    community_personnel_model_->setHeaderData(2, Qt::Horizontal,QString::fromLocal8Bit("照片"));
 
     special_peronnel_model_ = new QStandardItemModel();
-    special_peronnel_model_->setColumnCount(5);
-    special_peronnel_model_->setHeaderData(0, Qt::Horizontal,QString::fromLocal8Bit("选择"));
-    special_peronnel_model_->setHeaderData(1, Qt::Horizontal,QString::fromLocal8Bit("ID"));
-    special_peronnel_model_->setHeaderData(2, Qt::Horizontal,QString::fromLocal8Bit("姓名"));
-    special_peronnel_model_->setHeaderData(3, Qt::Horizontal,QString::fromLocal8Bit("备注"));
-    special_peronnel_model_->setHeaderData(4, Qt::Horizontal,QString::fromLocal8Bit("照片"));
+    special_peronnel_model_->setColumnCount(4);
+    special_peronnel_model_->setHeaderData(0, Qt::Horizontal,QString::fromLocal8Bit("ID"));
+    special_peronnel_model_->setHeaderData(1, Qt::Horizontal,QString::fromLocal8Bit("姓名"));
+    special_peronnel_model_->setHeaderData(2, Qt::Horizontal,QString::fromLocal8Bit("备注"));
+    special_peronnel_model_->setHeaderData(3, Qt::Horizontal,QString::fromLocal8Bit("照片"));
 
     passing_info_model_ = new QStandardItemModel();
     passing_info_model_->setColumnCount(4);
@@ -63,15 +64,19 @@ ControlWindow::ControlWindow(QWidget *parent) :
 
     // set table
     ui->CommunityPersonnelTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->CommunityPersonnelTable->verticalHeader()->setDefaultSectionSize(100);
     ui->CommunityPersonnelTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     ui->SpecialPersonnelTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->SpecialPersonnelTable->verticalHeader()->setDefaultSectionSize(100);
     ui->SpecialPersonnelTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     ui->PassingInfoTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->PassingInfoTable->verticalHeader()->setDefaultSectionSize(100);
     ui->PassingInfoTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     ui->ExceptionalCaselTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->ExceptionalCaselTable->verticalHeader()->setDefaultSectionSize(100);
     ui->ExceptionalCaselTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     // set model
@@ -156,10 +161,12 @@ void ControlWindow::updateCommunityPersonnelModel() {
 
     int size = json_array.size();
     for (int i = 0; i < size; i++) {
-        community_personnel_model_->setItem(i, 1, new QStandardItem(json_array.at(i)["id"].toString()));
-        community_personnel_model_->setItem(i, 2, new QStandardItem(json_array.at(i)["name"].toString()));
-        community_personnel_model_->setItem(i, 3, new QStandardItem(json_array.at(i)["image_path"].toString()));
+        QCheckBox box(this);
+        QIcon icon(json_array.at(i)["image_path"].toString());
 
+        community_personnel_model_->setItem(i, 0, new QStandardItem(json_array.at(i)["id"].toString()));
+        community_personnel_model_->setItem(i, 1, new QStandardItem(json_array.at(i)["name"].toString()));
+        community_personnel_model_->setItem(i, 2, new QStandardItem(icon, ""));
     }
 
     file.close();
@@ -189,9 +196,11 @@ void ControlWindow::addCommunityPersonData(QString id, QString name, QString ima
     file.close();
 
     int rows = community_personnel_model_->rowCount();
-    community_personnel_model_->setItem(rows, 1, new QStandardItem(id));
-    community_personnel_model_->setItem(rows, 2, new QStandardItem(name));
-    community_personnel_model_->setItem(rows, 3, new QStandardItem(image_path));
+    community_personnel_model_->setItem(rows, 0, new QStandardItem(id));
+    community_personnel_model_->setItem(rows, 1, new QStandardItem(name));
+
+    QIcon icon(image_path);
+    community_personnel_model_->setItem(rows, 2, new QStandardItem(icon, ""));
 
 }
 
@@ -228,10 +237,13 @@ void ControlWindow::addSpecialPeronData(QString id, QString name, QString remark
     file.close();
 
     int rows = special_peronnel_model_->rowCount();
-    special_peronnel_model_->setItem(rows, 1, new QStandardItem(id));
-    special_peronnel_model_->setItem(rows, 2, new QStandardItem(name));
-    special_peronnel_model_->setItem(rows, 3, new QStandardItem(remark));
-    special_peronnel_model_->setItem(rows, 4, new QStandardItem(image_path));
+
+    QIcon icon(image_path);
+
+    special_peronnel_model_->setItem(rows, 0, new QStandardItem(id));
+    special_peronnel_model_->setItem(rows, 1, new QStandardItem(name));
+    special_peronnel_model_->setItem(rows, 2, new QStandardItem(remark));
+    special_peronnel_model_->setItem(rows, 3, new QStandardItem(icon, ""));
 }
 
 void ControlWindow::on_SpecialPersonAddButton_clicked() {
@@ -257,10 +269,11 @@ void ControlWindow::updateSpecialPersonModel() {
 
     int size = json_array.size();
     for (int i = 0; i < size; i++) {
-        special_peronnel_model_->setItem(i, 1, new QStandardItem(json_array.at(i)["id"].toString()));
-        special_peronnel_model_->setItem(i, 2, new QStandardItem(json_array.at(i)["name"].toString()));
-        special_peronnel_model_->setItem(i, 3, new QStandardItem(json_array.at(i)["remark"].toString()));
-        special_peronnel_model_->setItem(i, 4, new QStandardItem(json_array.at(i)["image_path"].toString()));
+        QIcon icon(json_array.at(i)["image_path"].toString());
+        special_peronnel_model_->setItem(i, 0, new QStandardItem(json_array.at(i)["id"].toString()));
+        special_peronnel_model_->setItem(i, 1, new QStandardItem(json_array.at(i)["name"].toString()));
+        special_peronnel_model_->setItem(i, 2, new QStandardItem(json_array.at(i)["remark"].toString()));
+        special_peronnel_model_->setItem(i, 3, new QStandardItem(icon, ""));
 
     }
 
@@ -284,7 +297,9 @@ void ControlWindow::updatePassingInfoModel() {
         passing_info_model_->setItem(i, 0, new QStandardItem(json_array.at(i)["id"].toString()));
         passing_info_model_->setItem(i, 1, new QStandardItem(json_array.at(i)["name"].toString()));
         passing_info_model_->setItem(i, 2, new QStandardItem(json_array.at(i)["time"].toString()));
-        passing_info_model_->setItem(i, 3, new QStandardItem(json_array.at(i)["image_path"].toString()));
+
+        QIcon icon(json_array.at(i)["image_path"].toString());
+        passing_info_model_->setItem(i, 3, new QStandardItem(icon, ""));
 
     }
 
@@ -309,7 +324,9 @@ void ControlWindow::updateExceptionCaseModel() {
         exception_case_model_->setItem(i, 1, new QStandardItem(json_array.at(i)["name"].toString()));
         exception_case_model_->setItem(i, 2, new QStandardItem(json_array.at(i)["time"].toString()));
         exception_case_model_->setItem(i, 3, new QStandardItem(json_array.at(i)["remark"].toString()));
-        exception_case_model_->setItem(i, 4, new QStandardItem(json_array.at(i)["image_path"].toString()));
+
+        QIcon icon(json_array.at(i)["image_path"].toString());
+        exception_case_model_->setItem(i, 4, new QStandardItem(icon, ""));
 
     }
 
@@ -330,4 +347,148 @@ void ControlWindow::on_PassingInfoUpdateButton_clicked() {
 
 void ControlWindow::on_ExceptionCaseUpdateButton_clicked() {
     updateExceptionCaseModel();
+}
+
+void ControlWindow::on_SetCommunityPersonImageButton_clicked() {
+    QString fileName = QFileDialog::getOpenFileName(this, tr("设置社区人员图片"), "", tr("图片文件(*png *jpg);;"));
+    ui->CommunityPersonImage->setText(fileName);
+}
+
+void ControlWindow::on_SpecialPersonImageButton_clicked() {
+    QString fileName = QFileDialog::getOpenFileName(this, tr("设置特殊人员图片"), "", tr("图片文件(*png *jpg);;"));
+    ui->CommunityPersonImage->setText(fileName);
+}
+
+void ControlWindow::on_CommunityPersonDeleteButton_clicked() {
+    QItemSelectionModel *selections = ui->CommunityPersonnelTable->selectionModel();
+    QModelIndexList selected = selections->selectedRows();
+
+    vector<int> select_rows;
+    for (int i = 0; i < selected.size(); i++) {
+        select_rows.push_back(selected.at(i).row());
+    }
+
+    sort(select_rows.begin(), select_rows.end(), greater<int>());
+
+    vector<int>::iterator iter = select_rows.begin();
+    set<std::string> remove_set;
+    while (iter != select_rows.end()) {
+        string id = community_personnel_model_->item(*iter, 0)->text().toStdString();
+        remove_set.insert(id);
+        community_personnel_model_->removeRow(*iter);
+        iter++;
+    }
+
+    deletePassingInfo(remove_set);
+}
+
+void ControlWindow::on_CommunityPersonSelectAllButton_clicked() {
+    ui->CommunityPersonnelTable->selectAll();
+}
+
+void ControlWindow::on_SpecialPersonDeleteButton_clicked() {
+    QItemSelectionModel *selections = ui->SpecialPersonnelTable->selectionModel();
+    QModelIndexList selected = selections->selectedRows();
+
+    vector<int> select_rows;
+    for (int i = 0; i < selected.size(); i++) {
+        select_rows.push_back(selected.at(i).row());
+    }
+
+    sort(select_rows.begin(), select_rows.end(), greater<int>());
+
+    vector<int>::iterator iter = select_rows.begin();
+
+    set<std::string> remove_set;
+    while (iter != select_rows.end()) {
+        string id = special_peronnel_model_->item(*iter, 0)->text().toStdString();
+        remove_set.insert(id);
+
+        special_peronnel_model_->removeRow(*iter);
+        iter++;
+    }
+
+    deleteExceptionCase(remove_set);
+}
+
+void ControlWindow::on_SpecialPersonSelectButton_clicked() {
+    ui->SpecialPersonnelTable->selectAll();
+}
+
+void ControlWindow::deletePassingInfo(std::set<std::string> &ids) {
+    QFile file(community_personnel_file_.c_str());
+    file.open(QIODevice::ReadWrite);
+    QByteArray data = file.readAll();
+
+    //使用json文件对象加载字符串
+    QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+    QJsonArray json_array = json_doc.array();
+
+    int size = json_array.size();
+    list<int> remove_site;
+    for (int i = 0; i < size; i++) {
+        QJsonObject person = json_array.at(i).toObject();
+        string id = person.find("id")->toString().toStdString();
+
+        // 如果存在于删除集合
+        set<string>::iterator iter = ids.find(id);
+        if (iter != ids.end()) {
+            remove_site.push_front(i);
+            ids.erase(iter);
+        }
+
+    }
+
+    list<int>::iterator list_iter = remove_site.begin();
+
+    while (list_iter != remove_site.end()) {
+        json_array.removeAt(*list_iter);
+        list_iter++;
+    }
+
+    json_doc.setArray(json_array);
+
+    file.resize(0);
+    file.write(json_doc.toJson());
+    file.close();
+}
+
+void ControlWindow::deleteExceptionCase(std::set<std::string> &ids) {
+    QFile file(special_peronnel_file_.c_str());
+    file.open(QIODevice::ReadWrite);
+    QByteArray data = file.readAll();
+
+    //使用json文件对象加载字符串
+    QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+    QJsonArray json_array = json_doc.array();
+
+    int size = json_array.size();
+    list<int> remove_site;
+    for (int i = 0; i < size; i++) {
+        QJsonObject person = json_array.at(i).toObject();
+        string id = person.find("id")->toString().toStdString();
+
+        // 如果存在于删除集合
+        set<string>::iterator iter = ids.find(id);
+        if (iter != ids.end()) {
+            remove_site.push_front(i);
+            ids.erase(iter);
+        }
+
+    }
+
+    list<int>::iterator list_iter = remove_site.begin();
+
+    while (list_iter != remove_site.end()) {
+        json_array.removeAt(*list_iter);
+        list_iter++;
+    }
+
+    json_doc.setArray(json_array);
+
+    file.resize(0);
+    file.write(json_doc.toJson());
+    file.close();
 }
